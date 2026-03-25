@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    비활성 상태 리워드 아이콘 (회색 단색)
+    활성 상태는 ic_reward_active.xml 참조
+    menu에서 ic_reward_selector.xml 을 통해 자동 전환됨
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Row 1 -->
+    <path android:fillColor="@color/nav_inactive" android:pathData="M2,2 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M8,2 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M14,2 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M20,2 h2 q1,0 1,1 v4 q0,1 -1,1 h-2 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+
+    <!-- Row 2 -->
+    <path android:fillColor="@color/nav_inactive" android:pathData="M2,9 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M8,9 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M14,9 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M20,9 h2 q1,0 1,1 v4 q0,1 -1,1 h-2 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+
+    <!-- Row 3 -->
+    <path android:fillColor="@color/nav_inactive" android:pathData="M2,16 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M8,16 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M14,16 h4 q1,0 1,1 v4 q0,1 -1,1 h-4 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+    <path android:fillColor="@color/nav_inactive" android:pathData="M20,16 h2 q1,0 1,1 v4 q0,1 -1,1 h-2 q-1,0 -1,-1 v-4 q0,-1 1,-1 Z"/>
+
+</vector>
