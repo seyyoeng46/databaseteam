@@ -22,8 +22,8 @@
         → activity_main.xml 의 itemIconTint 는 @null 로 설정
     -->
     <item
-        android:id="@+id/nav_reward"
-        android:icon="@drawable/ic_reward_selector"
-        android:title="리워드" />
+        android:id="@+id/nav_mypage"
+        android:icon="@drawable/ic_mypage"
+        android:title="마이페이지" />
 
 </menu>

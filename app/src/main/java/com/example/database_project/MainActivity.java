@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new HomeFragment();
             } else if (id == R.id.nav_diary) {
                 fragment = new DiaryFragment();
-            } else if (id == R.id.nav_reward) {
-                fragment = new RewardFragment();
+            } else if (id == R.id.nav_mypage) {
+                fragment = new MypageFragment();
             } else {
                 return false;
             }
