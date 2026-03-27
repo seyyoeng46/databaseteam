@@ -1,6 +1,5 @@
 package com.example.database_project;
 import android.os.Bundle;
-import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -39,10 +38,6 @@ public class MainActivity extends AppCompatActivity {
             loadFragment(fragment);
             return true;
         });
-
-        // 임시 확인용 - 확인 후 삭제
-        Intent testIntent = new Intent(this, RoutineEditActivity.class);
-        startActivity(testIntent);
     }
 
     private void loadFragment(Fragment fragment) {
