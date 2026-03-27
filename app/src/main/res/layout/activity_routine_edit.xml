@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#F9F7F2">
+
+    <LinearLayout android:id="@+id/header"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:padding="16dp" android:layout_alignParentTop="true">
+        <ImageView android:id="@+id/btn_back"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:src="@drawable/ic_back" android:padding="6dp"
+            android:clickable="true" android:focusable="true"
+            android:contentDescription="뒤로가기" android:layout_marginEnd="8dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="루틴 수정" android:textSize="18sp"
+            android:textStyle="bold" android:textColor="#2C2C2A"/>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/footer"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="16dp" android:layout_alignParentBottom="true">
+        <Button android:id="@+id/btn_register"
+            android:layout_width="match_parent" android:layout_height="50dp"
+            android:text="등록" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#FFFFFF" android:background="@drawable/bg_btn_register"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_below="@id/header" android:layout_above="@id/footer"
+        android:overScrollMode="never">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <TextView android:id="@+id/tv_routine_name"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="루틴 이름" android:textSize="16sp"
+                android:textStyle="bold" android:textColor="#2C2C2A"
+                android:layout_marginBottom="16dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="0.8dp"
+                android:background="#E8E8E0" android:layout_marginBottom="16dp"/>
+
+            <LinearLayout android:id="@+id/ll_alarm_list"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginBottom="24dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="0.8dp"
+                android:background="#E8E8E0" android:layout_marginBottom="16dp"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="요일" android:textSize="13sp"
+                android:textColor="#888780" android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView android:id="@+id/tv_mon" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="월" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_tue" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="화" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_wed" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="수" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_thu" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="목" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_fri" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="금" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_sat" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="토" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:layout_marginEnd="5dp" android:clickable="true" android:focusable="true"/>
+                <TextView android:id="@+id/tv_sun" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="일" android:gravity="center" android:textSize="13sp" android:textColor="#888780" android:background="@drawable/bg_day_unselected" android:clickable="true" android:focusable="true"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
