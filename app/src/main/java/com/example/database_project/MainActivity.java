@@ -33,16 +33,13 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_mypage) {
                 fragment = new MypageFragment();
             } else {
-                return false;
+                return false;ㅜ틴
             }
 
             loadFragment(fragment);
             return true;
         });
 
-        // 임시 확인용 - 확인 후 삭제
-        Intent testIntent = new Intent(this, RoutineEditActivity.class);
-        startActivity(testIntent);
     }
 
     private void loadFragment(Fragment fragment) {
