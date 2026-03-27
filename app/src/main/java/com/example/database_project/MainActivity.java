@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_mypage) {
                 fragment = new MypageFragment();
             } else {
-                return false;ㅜ틴
+                return false;
             }
 
             loadFragment(fragment);
