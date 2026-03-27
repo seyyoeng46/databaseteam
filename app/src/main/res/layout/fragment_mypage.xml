@@ -1,13 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#F9F7F2">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="마이페이지"
-        android:textSize="20sp" />
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="마이페이지" android:textSize="20sp" android:textStyle="bold"
+        android:textColor="#2C2C2A" android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp" android:layout_marginBottom="8dp"/>
 
-</FrameLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+        android:overScrollMode="never">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="20dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:gravity="center"
+                android:paddingTop="16dp" android:paddingBottom="24dp">
+
+                <ImageView android:id="@+id/iv_profile"
+                    android:layout_width="80dp" android:layout_height="80dp"
+                    android:src="@drawable/ic_profile_placeholder"
+                    android:background="@drawable/bg_profile_circle"
+                    android:padding="18dp" android:scaleType="centerCrop"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView android:id="@+id/tv_name"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="이름" android:textSize="18sp"
+                    android:textStyle="bold" android:textColor="#2C2C2A"/>
+
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="0.8dp"
+                android:background="#E8E8E0" android:layout_marginBottom="16dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:background="@drawable/bg_info_card"
+                android:layout_marginBottom="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="이메일" android:textSize="12sp"
+                        android:textColor="#B0B0B0" android:layout_marginEnd="16dp"
+                        android:minWidth="48dp"/>
+                    <TextView android:id="@+id/tv_email"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="-" android:textSize="14sp"
+                        android:textColor="#2C2C2A" android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView android:id="@+id/btn_logout"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:text="로그아웃하기" android:textSize="14sp"
+                android:textStyle="bold" android:textColor="#E57373"
+                android:gravity="center" android:background="@drawable/bg_logout_btn"
+                android:clickable="true" android:focusable="true"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
