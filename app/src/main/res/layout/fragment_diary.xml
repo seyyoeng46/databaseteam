@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFAF4">
@@ -49,7 +51,7 @@
                 android:background="@drawable/bg_small_gray_btn"
                 android:padding="9dp"
                 android:src="@android:drawable/ic_menu_my_calendar"
-                android:tint="#5F4B3E"
+                app:tint="#5F4B3E"
                 android:contentDescription="날짜 검색" />
         </LinearLayout>
 
@@ -83,7 +85,7 @@
         android:background="@drawable/bg_circle_green"
         android:padding="18dp"
         android:src="@android:drawable/ic_input_add"
-        android:tint="#FFF8F2"
+        app:tint="#FFF8F2"
         android:contentDescription="일기 추가" />
 
 </RelativeLayout>
