@@ -1,266 +1,191 @@
 package com.example.database_project;
 
-import android.app.AlertDialog;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
-    private ImageView btnTodoAdd;
-    private ImageView btnTodoArrow;
-    private TextView tvTodoTitle;
-    private LinearLayout layoutTodoPreview;
-
-    private ImageView btnPrevMonth;
-    private ImageView btnNextMonth;
-    private TextView tvMonthTitle;
-    private GridLayout gridCalendar;
-
-    private Calendar currentMonth;
+    private int currentYear, currentMonth;
+    private final int[] grassData = {
+            0,2,0,1,3,0,1, 4,2,3,1,0,2,0,
+            1,0,3,2,1,0,2, 0,1,0,2,1,0,3, 0,1
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        btnTodoAdd = view.findViewById(R.id.btn_todo_add);
-        btnTodoArrow = view.findViewById(R.id.btn_todo_arrow);
-        tvTodoTitle = view.findViewById(R.id.tv_todo_title);
-        layoutTodoPreview = view.findViewById(R.id.layout_todo_preview);
+        Calendar cal = Calendar.getInstance();
+        currentYear = cal.get(Calendar.YEAR);
+        currentMonth = cal.get(Calendar.MONTH);
 
-        btnPrevMonth = view.findViewById(R.id.btn_prev_month);
-        btnNextMonth = view.findViewById(R.id.btn_next_month);
-        tvMonthTitle = view.findViewById(R.id.tv_month_title);
-        gridCalendar = view.findViewById(R.id.grid_calendar);
+        TextView tvDate = view.findViewById(R.id.tv_todo_date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일", Locale.KOREA);
+        tvDate.setText(sdf.format(new Date()) + " To-do");
 
-        currentMonth = Calendar.getInstance();
+        // 루틴 아이템
+        LinearLayout llRoutine = view.findViewById(R.id.ll_routine_items);
+        addRoutineItem(inflater, llRoutine, "기상 알람", "07:00", true);
+        addRoutineItem(inflater, llRoutine, "출발 준비", "08:00", false);
+        addRoutineItem(inflater, llRoutine, "운동 30분", "21:00", false);
 
-        btnTodoAdd.setOnClickListener(v -> showTodoAddDialog());
+        // 리스트 아이템
+        LinearLayout llList = view.findViewById(R.id.ll_list_items);
+        addListItem(inflater, llList, "과제 하기", true);
+        addListItem(inflater, llList, "답장하기", false);
+        addListItem(inflater, llList, "쓰레기 버리기", false);
 
-        btnTodoArrow.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), TodoDetailActivity.class);
-            startActivity(intent);
+        // 잔디 달력
+        TextView tvMonth = view.findViewById(R.id.tv_month_title);
+        LinearLayout llGrass = view.findViewById(R.id.ll_grass_calendar);
+        drawGrassCalendar(llGrass, tvMonth);
+
+        view.findViewById(R.id.btn_prev_month).setOnClickListener(v -> {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            drawGrassCalendar(llGrass, tvMonth);
         });
 
-        btnPrevMonth.setOnClickListener(v -> {
-            currentMonth.add(Calendar.MONTH, -1);
-            renderCalendar();
+        view.findViewById(R.id.btn_next_month).setOnClickListener(v -> {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            drawGrassCalendar(llGrass, tvMonth);
         });
-
-        btnNextMonth.setOnClickListener(v -> {
-            currentMonth.add(Calendar.MONTH, 1);
-            renderCalendar();
-        });
-
-        updateHomeTodoUI();
-        renderCalendar();
 
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateHomeTodoUI();
-        renderCalendar();
-    }
+    private void addRoutineItem(LayoutInflater inflater, LinearLayout parent,
+                                String content, String time, boolean done) {
+        View item = inflater.inflate(R.layout.item_todo_routine, parent, false);
+        TextView tvContent = item.findViewById(R.id.tv_content);
+        TextView tvTime = item.findViewById(R.id.tv_time);
+        ImageView ivCheck = item.findViewById(R.id.iv_check);
 
-    private void updateHomeTodoUI() {
-        ArrayList<TodoItem> list = TodoStorage.getTodayTodos(requireContext());
+        tvContent.setText(content);
+        tvTime.setText(time);
 
-        tvTodoTitle.setText(TodoStorage.getTodayString() + " To-do");
-        layoutTodoPreview.removeAllViews();
-
-        if (list.isEmpty()) {
-            btnTodoAdd.setVisibility(View.VISIBLE);
-            btnTodoArrow.setVisibility(View.GONE);
-
-            TextView emptyText = new TextView(requireContext());
-            emptyText.setText("오늘의 투두리스트가 없습니다.");
-            emptyText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
-            emptyText.setTextSize(18);
-            emptyText.setPadding(0, 10, 0, 0);
-
-            layoutTodoPreview.addView(emptyText);
-            return;
+        if (done) {
+            ivCheck.setImageResource(R.drawable.ic_check_circle_done);
+            tvContent.setPaintFlags(tvContent.getPaintFlags() |
+                    android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            tvContent.setAlpha(0.65f);
+        } else {
+            ivCheck.setImageResource(R.drawable.ic_check_circle_empty);
         }
 
-// 투두가 있어도 + 버튼은 항상 보이게
-        btnTodoAdd.setVisibility(View.VISIBLE);
-        btnTodoArrow.setVisibility(View.VISIBLE);
-
-        int max = Math.min(list.size(), 6);
-
-        for (int i = 0; i < max; i++) {
-            TodoItem item = list.get(i);
-
-            CheckBox cb = new CheckBox(requireContext());
-            cb.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-
-            cb.setText(item.getText());
-            cb.setChecked(item.isChecked());
-            cb.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
-            cb.setTextSize(15);
-            cb.setPadding(0, 8, 0, 8);
-
-            cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                item.setChecked(isChecked);
-                TodoStorage.saveTodayTodos(requireContext(), list);
-                renderCalendar(); // 체크 상태 바뀌면 달력 색도 반영
-            });
-
-            layoutTodoPreview.addView(cb);
-        }
+        parent.addView(item);
     }
 
-    private void renderCalendar() {
-        gridCalendar.removeAllViews();
+    private void addListItem(LayoutInflater inflater, LinearLayout parent,
+                             String content, boolean done) {
+        View item = inflater.inflate(R.layout.item_todo_list, parent, false);
+        TextView tvContent = item.findViewById(R.id.tv_content);
+        ImageView ivCheck = item.findViewById(R.id.iv_check);
 
-        SimpleDateFormat monthFormat = new SimpleDateFormat("M월", Locale.KOREA);
-        tvMonthTitle.setText(monthFormat.format(currentMonth.getTime()));
+        tvContent.setText(content);
 
-        Calendar cal = (Calendar) currentMonth.clone();
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        if (done) {
+            ivCheck.setImageResource(R.drawable.ic_check_box_done);
+            tvContent.setPaintFlags(tvContent.getPaintFlags() |
+                    android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            tvContent.setAlpha(0.65f);
+        } else {
+            ivCheck.setImageResource(R.drawable.ic_check_box_empty);
+        }
 
-        int firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1; // 일요일=0
+        parent.addView(item);
+    }
+
+    private void drawGrassCalendar(LinearLayout container, TextView tvMonth) {
+        container.removeAllViews();
+        tvMonth.setText((currentMonth + 1) + "월");
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(currentYear, currentMonth, 1);
+        int firstDay = cal.get(Calendar.DAY_OF_WEEK) - 1;
         int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        for (int i = 0; i < 42; i++) {
-            TextView dayView = new TextView(requireContext());
+        Calendar today = Calendar.getInstance();
+        int todayDay = (currentYear == today.get(Calendar.YEAR) &&
+                currentMonth == today.get(Calendar.MONTH))
+                ? today.get(Calendar.DAY_OF_MONTH) : -1;
 
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0;
-            params.height = dpToPx(48);
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            params.setMargins(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6));
-            dayView.setLayoutParams(params);
+        int day = 1;
+        for (int row = 0; row < 6; row++) {
+            if (day > daysInMonth) break;
 
-            dayView.setGravity(Gravity.CENTER);
-            dayView.setTextSize(16);
-            dayView.setBackgroundResource(android.R.color.transparent);
+            LinearLayout weekRow = new LinearLayout(requireContext());
+            weekRow.setOrientation(LinearLayout.HORIZONTAL);
+            weekRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            rowParams.setMargins(0, 0, 0, dpToPx(4));
+            weekRow.setLayoutParams(rowParams);
 
-            if (i >= firstDayOfWeek && i < firstDayOfWeek + daysInMonth) {
-                int day = i - firstDayOfWeek + 1;
-                Calendar dateCal = (Calendar) currentMonth.clone();
-                dateCal.set(Calendar.DAY_OF_MONTH, day);
+            TextView tvLabel = new TextView(requireContext());
+            tvLabel.setTextSize(9);
+            tvLabel.setTextColor(Color.parseColor("#888780"));
+            tvLabel.setMinWidth(dpToPx(24));
+            tvLabel.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+            tvLabel.setText(String.valueOf(row == 0 ? 1 : day));
+            weekRow.addView(tvLabel);
 
-                String dateKey = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
-                        .format(dateCal.getTime());
+            View sp = new View(requireContext());
+            sp.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(4), 1));
+            weekRow.addView(sp);
 
-                dayView.setText(String.valueOf(day));
-                dayView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.transparent));
+            for (int col = 0; col < 7; col++) {
+                int cellDay = (row == 0) ? (col - firstDay + 1) : (day + col);
+                View cell = new View(requireContext());
+                LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dpToPx(28), 1f);
+                cp.setMargins(dpToPx(2), 0, dpToPx(2), 0);
+                cell.setLayoutParams(cp);
 
-                ArrayList<TodoItem> todos = TodoStorage.getTodosByDate(requireContext(), dateKey);
-
-                if (todos.isEmpty()) {
-                    dayView.setBackgroundResource(R.drawable.bg_calendar_empty);
+                if (cellDay < 1 || cellDay > daysInMonth) {
+                    cell.setBackgroundColor(Color.TRANSPARENT);
+                } else if (cellDay == todayDay) {
+                    cell.setBackground(ContextCompat.getDrawable(
+                            requireContext(), R.drawable.bg_grass_today));
                 } else {
-                    int colorRes = getCalendarColorRes(todos);
-                    dayView.setBackgroundResource(colorRes);
-
-                    dayView.setOnClickListener(v -> showTodoHistoryDialog(dateKey, todos));
+                    int lv = (cellDay - 1 < grassData.length) ? grassData[cellDay - 1] : 0;
+                    cell.setBackground(ContextCompat.getDrawable(
+                            requireContext(), getGrassBg(lv)));
                 }
-
-            } else {
-                dayView.setBackgroundResource(android.R.color.transparent);
+                weekRow.addView(cell);
             }
 
-            gridCalendar.addView(dayView);
+            day = (row == 0) ? (1 + 7 - firstDay) : (day + 7);
+            container.addView(weekRow);
         }
     }
 
-    private int getCalendarColorRes(ArrayList<TodoItem> todos) {
-        int total = todos.size();
-        int done = 0;
-
-        for (TodoItem item : todos) {
-            if (item.isChecked()) done++;
-        }
-
-        float ratio = total == 0 ? 0 : (float) done / total;
-
-        if (ratio == 0f) return R.drawable.bg_calendar_level1;
-        if (ratio < 0.5f) return R.drawable.bg_calendar_level2;
-        if (ratio < 1f) return R.drawable.bg_calendar_level3;
-        return R.drawable.bg_calendar_level4;
-    }
-
-    private void showTodoHistoryDialog(String dateKey, ArrayList<TodoItem> todos) {
-        StringBuilder sb = new StringBuilder();
-
-        for (TodoItem item : todos) {
-            sb.append(item.isChecked() ? "☑ " : "☐ ")
-                    .append(item.getText())
-                    .append("\n");
-        }
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle(dateKey + " 투두리스트")
-                .setMessage(sb.toString())
-                .setPositiveButton("확인", null)
-                .show();
-    }
-
-    private void showTodoAddDialog() {
-        ArrayList<TodoItem> list = TodoStorage.getTodayTodos(requireContext());
-
-        if (list.isEmpty()) {
-            // 투두가 없을 때: AI 추가 + 직접 추가 둘 다 표시
-            String[] options = {"AI로 투두리스트 추가하기", "직접 추가하기"};
-
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("투두리스트 추가")
-                    .setItems(options, (dialog, which) -> {
-                        Intent intent = new Intent(requireContext(), TodoDetailActivity.class);
-
-                        if (which == 0) {
-                            intent.putExtra("create_mode", "ai");
-                        } else {
-                            intent.putExtra("create_mode", "direct");
-                        }
-
-                        startActivity(intent);
-                    })
-                    .show();
-
-        } else {
-            // 투두가 이미 있을 때: AI 추가만 표시
-            String[] options = {"AI로 투두리스트 추가하기"};
-
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("투두리스트 추가")
-                    .setItems(options, (dialog, which) -> {
-                        Intent intent = new Intent(requireContext(), TodoDetailActivity.class);
-                        intent.putExtra("create_mode", "ai");
-                        startActivity(intent);
-                    })
-                    .show();
+    private int getGrassBg(int level) {
+        switch (level) {
+            case 1: return R.drawable.bg_calendar_level1;
+            case 2: return R.drawable.bg_calendar_level2;
+            case 3: return R.drawable.bg_calendar_level3;
+            case 4: return R.drawable.bg_calendar_level4;
+            default: return R.drawable.bg_calendar_empty;
         }
     }
 
     private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
+        return Math.round(dp * requireContext().getResources().getDisplayMetrics().density);
     }
 }

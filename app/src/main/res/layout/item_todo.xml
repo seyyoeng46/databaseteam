@@ -37,4 +37,5 @@
         android:contentDescription="삭제"
         android:src="@android:drawable/ic_delete"
         app:tint="#FFDDD8" />
+
 </LinearLayout>
