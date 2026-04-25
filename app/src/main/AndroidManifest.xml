@@ -35,6 +35,16 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- 투두 생성 화면 추가 -->
+        <activity
+            android:name=".TodoCreateActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity android:name=".TodoDetailActivity" />
+
+        <activity android:name=".DiaryWriteActivity" />
+
         <!-- 알람 설정 -->
         <activity
             android:name=".AlarmEditActivity"
