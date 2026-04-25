@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="#F9F7F2">
 
+    <!-- 상단 헤더 -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -22,11 +23,11 @@
             android:padding="6dp"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="뒤로가기"
-            android:layout_marginEnd="8dp"/>
+            android:contentDescription="뒤로가기"/>
 
     </LinearLayout>
 
+    <!-- 하단 완료 버튼 -->
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
@@ -47,6 +48,7 @@
 
     </LinearLayout>
 
+    <!-- 컨텐츠 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -56,20 +58,39 @@
         android:gravity="center_horizontal"
         android:padding="24dp">
 
-        <!-- 시간 표시 (클릭 시 TimePicker) -->
-        <TextView
-            android:id="@+id/tv_time"
+        <!-- NumberPicker 시간 선택 -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="06:00"
-            android:textSize="64sp"
-            android:textStyle="bold"
-            android:textColor="#2C2C2A"
-            android:layout_marginBottom="48dp"
-            android:clickable="true"
-            android:focusable="true"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="48dp">
 
-        <!-- 루틴 이름 레이블 -->
+            <!-- 시 -->
+            <NumberPicker
+                android:id="@+id/picker_hour"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="#2C2C2A"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- 분 -->
+            <NumberPicker
+                android:id="@+id/picker_minute"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <!-- 루틴 이름 라벨 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
