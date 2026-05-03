@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9F7F2">
+
+    <!-- 상단 헤더 -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_back"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="뒤로가기"/>
+
+    </LinearLayout>
+
+    <!-- 하단 완료 버튼 -->
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_done"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="완료"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_btn_register"
+            android:stateListAnimator="@null"/>
+
+    </LinearLayout>
+
+    <!-- 컨텐츠 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"
+        android:layout_above="@id/footer"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <!-- NumberPicker 시간 선택 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="48dp">
+
+            <!-- 시 -->
+            <NumberPicker
+                android:id="@+id/picker_hour"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="#2C2C2A"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- 분 -->
+            <NumberPicker
+                android:id="@+id/picker_minute"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <!-- 루틴 이름 라벨 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="루틴 이름"
+            android:textSize="14sp"
+            android:textColor="#2C2C2A"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- 내용 입력 -->
+        <EditText
+            android:id="@+id/et_alarm_desc"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="내용을 입력해주세요."
+            android:textSize="14sp"
+            android:textColor="#2C2C2A"
+            android:textColorHint="#B4B2A9"
+            android:background="@drawable/bg_edit_input"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
