@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9F7F2">
+
+    <!-- 상단 헤더 -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_back"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="뒤로가기"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="루틴 만들기"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#2C2C2A"/>
+
+    </LinearLayout>
+
+    <!-- 하단 입력창 (바닥에 고정) -->
+    <LinearLayout
+        android:id="@+id/input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true">
+
+        <!-- + 버튼 -->
+        <TextView
+            android:id="@+id/btn_plus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:text="+"
+            android:textSize="22sp"
+            android:textColor="#4CAF50"
+            android:gravity="center"
+            android:background="@drawable/bg_plus_button"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <!-- 입력창 -->
+        <EditText
+            android:id="@+id/et_input"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:hint="AI에게 루틴 생성시키기"
+            android:textSize="13sp"
+            android:textColor="#2C2C2A"
+            android:textColorHint="#B4B2A9"
+            android:background="@drawable/bg_input_field"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginEnd="8dp"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+        <!-- 마이크 버튼 -->
+        <ImageView
+            android:id="@+id/btn_mic"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:background="@drawable/bg_input_field"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="음성 입력"/>
+
+    </LinearLayout>
+
+    <!-- 채팅 메시지 영역 (헤더 아래 ~ 입력창 위) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"
+        android:layout_above="@id/input_bar"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"/>
+
+</RelativeLayout>
