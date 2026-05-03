@@ -17,6 +17,10 @@ public interface RoutineApi {
     @GET("api/routine/user/{userId}")
     Call<RoutineResponse> getRoutines(@Path("userId") String userId);
 
+    //루틴 생성
+    @POST("api/routine")
+    Call<BasicResponse> createRoutine(@Body Map<String, Object> body);
+
     // 루틴 수정
     @PUT("api/routine/{routineId}")
     Call<BasicResponse> updateRoutine(

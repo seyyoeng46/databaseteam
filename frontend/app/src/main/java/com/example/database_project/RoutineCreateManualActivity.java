@@ -1,6 +1,5 @@
 package com.example.database_project;
 
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +14,11 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RoutineCreateManualActivity extends AppCompatActivity {
 
@@ -123,7 +127,7 @@ public class RoutineCreateManualActivity extends AppCompatActivity {
         // 선택된 요일 수집
         List<Integer> selectedDays = new ArrayList<>();
         for (int i = 0; i < daySelected.length; i++) {
-            if (daySelected[i]) selectedDays.add(i + 1); // 1=월 ~ 7=일
+            if (daySelected[i]) selectedDays.add(i); // 0=일, 1=월 ... 6=토
         }
 
         if (selectedDays.isEmpty()) {
@@ -131,9 +135,80 @@ public class RoutineCreateManualActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: DB 저장 (Retrofit 연동 후)
-        Toast.makeText(this, "루틴이 등록됐습니다!", Toast.LENGTH_SHORT).show();
-        finish();
+        // DB에 저장
+        Map<String, Object> body = new HashMap<>();
+        body.put("user_id", "17c6f527-dad9-4e23-bbcd-7343b2cca698");
+        body.put("routine_name", routineName);
+        body.put("description", "");
+        body.put("schedules", selectedDays);
+
+        RetrofitClient.getRoutineApi()
+                .createRoutine(body)
+                .enqueue(new Callback<BasicResponse>() {
+                    @Override
+                    public void onResponse(Call<BasicResponse> call,
+                                           Response<BasicResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().success) {
+
+                            // 루틴 생성 성공 후 아이템 저장
+                            String routineId = response.body().routineId;
+                            saveAlarmItems(routineId);
+
+                        } else {
+                            Toast.makeText(RoutineCreateManualActivity.this,
+                                    "등록 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BasicResponse> call, Throwable t) {
+                        Toast.makeText(RoutineCreateManualActivity.this,
+                                "서버 오류: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void saveAlarmItems(String routineId) {
+        int count = llAlarmList.getChildCount();
+        int[] savedCount = {0};
+
+        for (int i = 0; i < count; i++) {
+            View row = llAlarmList.getChildAt(i);
+            String time = ((TextView) row.findViewById(R.id.tv_alarm_time)).getText().toString();
+            String desc = ((TextView) row.findViewById(R.id.tv_alarm_desc)).getText().toString();
+            String itemName = time + " " + desc;
+
+            Map<String, String> itemBody = new HashMap<>();
+            itemBody.put("item_name", itemName);
+
+            RetrofitClient.getRoutineApi()
+                    .addItem(routineId, itemBody)
+                    .enqueue(new Callback<BasicResponse>() {
+                        @Override
+                        public void onResponse(Call<BasicResponse> call,
+                                               Response<BasicResponse> response) {
+                            savedCount[0]++;
+                            if (savedCount[0] == count) {
+                                Toast.makeText(RoutineCreateManualActivity.this,
+                                        "루틴이 등록됐습니다!", Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<BasicResponse> call, Throwable t) {
+                            savedCount[0]++;
+                            if (savedCount[0] == count) {
+                                Toast.makeText(RoutineCreateManualActivity.this,
+                                        "루틴이 등록됐습니다!", Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                        }
+                    });
+        }
     }
 
     private void toggleDay(int index) {
