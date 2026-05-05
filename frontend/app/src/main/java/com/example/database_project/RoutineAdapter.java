@@ -2,7 +2,6 @@ package com.example.database_project;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,26 +20,42 @@ import retrofit2.Response;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder> {
 
+    public interface OnRoutineDeletedListener {
+        void onDeleted();
+    }
+
+    public interface OnRoutineEditListener {
+        void onEdit(RoutineItem item);
+    }
+
     public static class RoutineItem {
         String name;
         String[] alarms;
         String day;
         String id;
+        int[] schedules;
 
-        public RoutineItem(String name, String[] alarms, String day, String id) {
+        public RoutineItem(String name, String[] alarms, String day, String id,int[] schedules) {
             this.name = name;
             this.alarms = alarms;
             this.day = day;
             this.id = id;
+            this.schedules = schedules;
         }
     }
 
     private final Context context;
     private final List<RoutineItem> routineList;
+    private final OnRoutineDeletedListener deleteListener;
+    private final OnRoutineEditListener editListener;
 
-    public RoutineAdapter(Context context, List<RoutineItem> routineList) {
+    public RoutineAdapter(Context context, List<RoutineItem> routineList,
+                          OnRoutineDeletedListener deleteListener,
+                          OnRoutineEditListener editListener) {
         this.context = context;
         this.routineList = routineList;
+        this.deleteListener = deleteListener;
+        this.editListener = editListener;
     }
 
     @NonNull
@@ -84,10 +99,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
 
         // 수정 버튼
         holder.tvEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(context, RoutineEditActivity.class);
-            intent.putExtra("routine_id", item.id);
-            intent.putExtra("routine_name", item.name);
-            context.startActivity(intent);
+            if (editListener != null) editListener.onEdit(item);
         });
 
         // 삭제 버튼
@@ -106,7 +118,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
     }
 
     private void deleteRoutine(RoutineItem item, int position) {
-        RetrofitClient.getRoutineApi()
+        RetrofitClient.getRoutineApi(context)
                 .deleteRoutine(item.id)
                 .enqueue(new Callback<BasicResponse>() {
                     @Override
@@ -118,6 +130,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
                             notifyItemRemoved(position);
                             notifyItemRangeChanged(position, routineList.size());
                             Toast.makeText(context, "루틴이 삭제됐어요", Toast.LENGTH_SHORT).show();
+                            if (deleteListener != null) deleteListener.onDeleted();
                         } else {
                             Toast.makeText(context, "삭제 실패", Toast.LENGTH_SHORT).show();
                         }

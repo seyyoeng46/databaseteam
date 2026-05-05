@@ -75,7 +75,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="자연어로 말하면 AI가 루틴을 만들어줘요"
+                android:text="AI가 루틴을 만들어줘요"
                 android:textSize="11sp"
                 android:textColor="#888780"/>
 
@@ -129,7 +129,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="루틴 이름, 알람, 요일을 직접 설정해요"
+                android:text="루틴과 리스트를 직접 설정해요"
                 android:textSize="11sp"
                 android:textColor="#888780"/>
 

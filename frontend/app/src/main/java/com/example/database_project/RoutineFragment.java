@@ -27,7 +27,6 @@ import retrofit2.Response;
 
 public class RoutineFragment extends Fragment {
 
-    private static final String USER_ID = "17c6f527-dad9-4e23-bbcd-7343b2cca698";
     private static final int REQUEST_CREATE_ROUTINE = 2001;
 
     private RoutineAdapter adapter;
@@ -43,7 +42,21 @@ public class RoutineFragment extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         tvCount = view.findViewById(R.id.tv_routine_count);
 
-        adapter = new RoutineAdapter(getContext(), routineList);
+        adapter = new RoutineAdapter(getContext(), routineList,
+                () -> {
+                    if (tvCount != null)
+                        tvCount.setText("등록된 루틴 " + routineList.size() + "개");
+                },
+                item -> {
+                    Intent intent = new Intent(getActivity(), RoutineEditActivity.class);
+                    intent.putExtra("routine_id", item.id);
+                    intent.putExtra("routine_name", item.name);
+                    if (item.schedules != null) {
+                        intent.putExtra("routine_schedules", item.schedules);
+                    }
+                    startActivityForResult(intent, 3001);
+                }
+        );
         rv.setAdapter(adapter);
 
         loadRoutines();
@@ -57,14 +70,14 @@ public class RoutineFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CREATE_ROUTINE) {
+        if (requestCode == REQUEST_CREATE_ROUTINE || requestCode == 3001) {
             loadRoutines();
         }
     }
 
     private void loadRoutines() {
-        RetrofitClient.getRoutineApi()
-                .getRoutines(USER_ID)
+        RetrofitClient.getRoutineApi(getContext())
+                .getRoutines()
                 .enqueue(new Callback<RoutineResponse>() {
                     @Override
                     public void onResponse(Call<RoutineResponse> call,
@@ -87,7 +100,16 @@ public class RoutineFragment extends Fragment {
                             for (RoutineResponse.RoutineData data : dataList) {
                                 String dayText = convertDays(data.schedules);
 
-                                RetrofitClient.getRoutineApi()
+                                int[] schedulesArr = new int[0];
+                                if (data.schedules != null) {
+                                    schedulesArr = new int[data.schedules.size()];
+                                    for (int i = 0; i < data.schedules.size(); i++) {
+                                        schedulesArr[i] = data.schedules.get(i);
+                                    }
+                                }
+                                final int[] finalSchedulesArr = schedulesArr;
+
+                                RetrofitClient.getRoutineApi(getContext())
                                         .getItems(data.id)
                                         .enqueue(new Callback<ItemResponse>() {
                                             @Override
@@ -98,9 +120,20 @@ public class RoutineFragment extends Fragment {
                                                         && response.body() != null
                                                         && response.body().data != null
                                                         && !response.body().data.isEmpty()) {
-                                                    alarms = new String[response.body().data.size()];
-                                                    for (int i = 0; i < response.body().data.size(); i++) {
-                                                        alarms[i] = response.body().data.get(i).title;
+
+                                                    // 시간순 정렬
+                                                    List<ItemResponse.ItemData> items = response.body().data;
+                                                    items.sort((a, b) -> {
+                                                        String timeA = a.title != null && a.title.contains(" ")
+                                                                ? a.title.substring(0, a.title.indexOf(" ")) : a.title;
+                                                        String timeB = b.title != null && b.title.contains(" ")
+                                                                ? b.title.substring(0, b.title.indexOf(" ")) : b.title;
+                                                        return timeA.compareTo(timeB);
+                                                    });
+
+                                                    alarms = new String[items.size()];
+                                                    for (int i = 0; i < items.size(); i++) {
+                                                        alarms[i] = items.get(i).title;
                                                     }
                                                 } else {
                                                     alarms = new String[]{"알람 없음"};
@@ -108,7 +141,8 @@ public class RoutineFragment extends Fragment {
 
                                                 synchronized (routineList) {
                                                     routineList.add(new RoutineAdapter.RoutineItem(
-                                                            data.routineName, alarms, dayText, data.id));
+                                                            data.routineName, alarms, dayText,
+                                                            data.id, finalSchedulesArr));
                                                     loadedCount[0]++;
                                                     if (loadedCount[0] == total) {
                                                         adapter.notifyDataSetChanged();
@@ -122,7 +156,8 @@ public class RoutineFragment extends Fragment {
                                             public void onFailure(Call<ItemResponse> call, Throwable t) {
                                                 synchronized (routineList) {
                                                     routineList.add(new RoutineAdapter.RoutineItem(
-                                                            data.routineName, new String[]{"알람 없음"}, dayText, data.id));
+                                                            data.routineName, new String[]{"알람 없음"},
+                                                            dayText, data.id, finalSchedulesArr));
                                                     loadedCount[0]++;
                                                     if (loadedCount[0] == total) {
                                                         adapter.notifyDataSetChanged();
