@@ -10,6 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RoutineApi {
 
@@ -53,4 +54,25 @@ public interface RoutineApi {
     Call<BasicResponse> deleteItem(
             @Path("routineId") String routineId,
             @Path("itemId") String itemId);
+
+    // 투두 추가
+    @POST("api/todo")
+    Call<BasicResponse> addTodo(@Body Map<String, String> body);
+
+    // 투두 목록 조회
+    @GET("api/todo")
+    Call<TodoResponse> getTodos(@Query("target_date") String targetDate);
+
+    @GET("api/todo/all")
+    Call<TodoAllResponse> getAllTodos();
+
+    // 투두 삭제
+    @DELETE("api/todo/{id}")
+    Call<BasicResponse> deleteTodo(@Path("id") String id);
+
+    // 투두 수정
+    @PATCH("api/todo/{id}")
+    Call<BasicResponse> patchTodo(
+            @Path("id") String id,
+            @Body Map<String, String> body);
 }

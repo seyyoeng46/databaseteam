@@ -62,6 +62,8 @@
             android:name=".RoutineCreateManualActivity"
             android:exported="false"/>
 
+        <activity android:name=".TodoEditActivity" android:exported="false"/>
+
     </application>
 
 </manifest>

@@ -4,7 +4,7 @@
     <item
         android:id="@+id/nav_routine"
         android:icon="@drawable/ic_routine"
-        android:title="루틴" />
+        android:title="TODO" />
 
     <item
         android:id="@+id/nav_home"

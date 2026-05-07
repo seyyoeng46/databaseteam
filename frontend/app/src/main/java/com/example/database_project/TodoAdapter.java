@@ -1,6 +1,7 @@
 package com.example.database_project;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,25 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
     public interface OnTodoChangedListener {
         void onTodoDeleted();
         void onTodoUpdated();
+    }
+
+    public interface OnDeleteListener {
+        void onDelete(int position);
+    }
+
+    public interface OnEditListener {
+        void onEdit(int position, String newText);
+    }
+
+    private OnDeleteListener onDeleteListener;
+    private OnEditListener onEditListener;
+
+    public void setOnDeleteListener(OnDeleteListener listener) {
+        this.onDeleteListener = listener;
+    }
+
+    public void setOnEditListener(OnEditListener listener) {
+        this.onEditListener = listener;
     }
 
     private final ArrayList<TodoItem> todoList;
@@ -58,9 +78,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
                     .setPositiveButton("저장", (dialog, which) -> {
                         String newText = editText.getText().toString().trim();
                         if (!newText.isEmpty()) {
+                            // 로컬 업데이트
                             todoList.get(currentPosition).setText(newText);
                             notifyItemChanged(currentPosition);
                             if (listener != null) listener.onTodoUpdated();
+                            // DB 업데이트 콜백
+                            if (onEditListener != null) {
+                                onEditListener.onEdit(currentPosition, newText);
+                            }
                         }
                     })
                     .setNegativeButton("취소", null)
@@ -69,12 +94,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
 
         // 삭제 버튼
         holder.btnDelete.setOnClickListener(v -> {
-            int currentPosition = holder.getAdapterPosition();
-            if (currentPosition != RecyclerView.NO_POSITION) {
-                todoList.remove(currentPosition);
-                notifyItemRemoved(currentPosition);
-                notifyItemRangeChanged(currentPosition, todoList.size());
-                if (listener != null) listener.onTodoDeleted();
+            int pos = holder.getAdapterPosition();
+            if (onDeleteListener != null) {
+                onDeleteListener.onDelete(pos);
             }
         });
     }

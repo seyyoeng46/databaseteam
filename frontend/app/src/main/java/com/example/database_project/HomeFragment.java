@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
 
     private void addListItem(LayoutInflater inflater, LinearLayout parent,
                              String content, boolean done) {
-        View item = inflater.inflate(R.layout.item_todo_list, parent, false);
+        View item = inflater.inflate(R.layout.item_todo_row, parent, false); // ← 변경
         TextView tvContent = item.findViewById(R.id.tv_content);
         ImageView ivCheck = item.findViewById(R.id.iv_check);
 

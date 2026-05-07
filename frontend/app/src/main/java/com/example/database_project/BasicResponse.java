@@ -11,4 +11,7 @@ public class BasicResponse {
 
     @SerializedName("routine_id")
     public String routineId;
+
+    @SerializedName("id")
+    public String todoId;
 }

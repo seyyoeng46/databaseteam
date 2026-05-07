@@ -31,7 +31,10 @@ public class RoutineFragment extends Fragment {
 
     private RoutineAdapter adapter;
     private List<RoutineAdapter.RoutineItem> routineList = new ArrayList<>();
-    private TextView tvCount;
+    private List<RoutineAdapter.RoutineItem> fullList = new ArrayList<>();
+    private TextView tvRoutineCount;
+    private TextView tvFilterLabel;
+    private int currentFilter = 0; // 0=전체, 1=루틴, 2=리스트
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,26 +43,38 @@ public class RoutineFragment extends Fragment {
 
         RecyclerView rv = view.findViewById(R.id.rv_routines);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        tvCount = view.findViewById(R.id.tv_routine_count);
+        tvRoutineCount = view.findViewById(R.id.tv_routine_count);
+        tvFilterLabel  = view.findViewById(R.id.tv_filter_label);
 
         adapter = new RoutineAdapter(getContext(), routineList,
                 () -> {
-                    if (tvCount != null)
-                        tvCount.setText("등록된 루틴 " + routineList.size() + "개");
+                    fullList.removeIf(item -> !routineList.contains(item));
+                    updateCount();
                 },
                 item -> {
                     Intent intent = new Intent(getActivity(), RoutineEditActivity.class);
                     intent.putExtra("routine_id", item.id);
                     intent.putExtra("routine_name", item.name);
-                    if (item.schedules != null) {
-                        intent.putExtra("routine_schedules", item.schedules);
-                    }
+                    int[] schedules = item.schedules != null ? item.schedules : new int[0];
+                    intent.putExtra("routine_schedules", schedules);
                     startActivityForResult(intent, 3001);
+                },
+                item -> {
+                    // 투두 수정 → Fragment에서 직접 startActivityForResult
+                    Intent intent = new Intent(getActivity(), TodoEditActivity.class);
+                    intent.putExtra("todo_date", item.name);
+                    intent.putExtra("todo_items", item.alarms);
+                    intent.putExtra("todo_ids", item.todoIds);
+                    startActivityForResult(intent, 5001);
                 }
         );
         rv.setAdapter(adapter);
 
+        // 필터 버튼
+        view.findViewById(R.id.btn_filter).setOnClickListener(v -> showFilterPopup(v));
+
         loadRoutines();
+        loadTodos();
 
         FloatingActionButton fab = view.findViewById(R.id.fab_add);
         fab.setOnClickListener(v -> showAddBottomSheet());
@@ -72,6 +87,65 @@ public class RoutineFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CREATE_ROUTINE || requestCode == 3001) {
             loadRoutines();
+        } else if (requestCode == 4001 && resultCode == android.app.Activity.RESULT_OK) {
+            loadTodos();
+        } else if (requestCode == 5001 && resultCode == android.app.Activity.RESULT_OK) {
+            loadTodos();
+        }
+    }
+
+    private void showFilterPopup(View anchor) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), anchor);
+        popup.getMenu().add(0, 0, 0, "전체");
+        popup.getMenu().add(0, 1, 1, "루틴");
+        popup.getMenu().add(0, 2, 2, "리스트");
+
+        popup.setOnMenuItemClickListener(menuItem -> {
+            currentFilter = menuItem.getItemId();
+            switch (currentFilter) {
+                case 0: tvFilterLabel.setText("전체"); break;
+                case 1: tvFilterLabel.setText("루틴"); break;
+                case 2: tvFilterLabel.setText("리스트"); break;
+            }
+            applyFilter();
+            return true;
+        });
+        popup.show();
+    }
+
+    private void applyFilter() {
+        routineList.clear();
+        for (RoutineAdapter.RoutineItem item : fullList) {
+            if (currentFilter == 0) {
+                routineList.add(item);
+            } else if (currentFilter == 1 && item.type == RoutineAdapter.TYPE_ROUTINE) {
+                routineList.add(item);
+            } else if (currentFilter == 2 && item.type == RoutineAdapter.TYPE_TODO) {
+                routineList.add(item);
+            }
+        }
+        adapter.notifyDataSetChanged();
+        updateCount();
+    }
+
+    private void updateCount() {
+        long routineCount = fullList.stream()
+                .filter(item -> item.type == RoutineAdapter.TYPE_ROUTINE).count();
+        long todoCount = fullList.stream()
+                .filter(item -> item.type == RoutineAdapter.TYPE_TODO).count();
+
+        if (tvRoutineCount == null) return;
+
+        switch (currentFilter) {
+            case 0:
+                tvRoutineCount.setText("전체 " + (routineCount + todoCount) + "개");
+                break;
+            case 1:
+                tvRoutineCount.setText("루틴 " + routineCount + "개");
+                break;
+            case 2:
+                tvRoutineCount.setText("리스트 " + todoCount + "개");
+                break;
         }
     }
 
@@ -85,15 +159,14 @@ public class RoutineFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().success) {
 
-                            routineList.clear();
+                            fullList.removeIf(item -> item.type == RoutineAdapter.TYPE_ROUTINE);
 
                             List<RoutineResponse.RoutineData> dataList = response.body().data;
                             int[] loadedCount = {0};
                             int total = dataList.size();
 
                             if (total == 0) {
-                                adapter.notifyDataSetChanged();
-                                if (tvCount != null) tvCount.setText("등록된 루틴 0개");
+                                applyFilter();
                                 return;
                             }
 
@@ -121,7 +194,6 @@ public class RoutineFragment extends Fragment {
                                                         && response.body().data != null
                                                         && !response.body().data.isEmpty()) {
 
-                                                    // 시간순 정렬
                                                     List<ItemResponse.ItemData> items = response.body().data;
                                                     items.sort((a, b) -> {
                                                         String timeA = a.title != null && a.title.contains(" ")
@@ -139,30 +211,30 @@ public class RoutineFragment extends Fragment {
                                                     alarms = new String[]{"알람 없음"};
                                                 }
 
-                                                synchronized (routineList) {
-                                                    routineList.add(new RoutineAdapter.RoutineItem(
+                                                synchronized (fullList) {
+                                                    fullList.add(new RoutineAdapter.RoutineItem(
                                                             data.routineName, alarms, dayText,
                                                             data.id, finalSchedulesArr));
                                                     loadedCount[0]++;
                                                     if (loadedCount[0] == total) {
-                                                        adapter.notifyDataSetChanged();
-                                                        if (tvCount != null)
-                                                            tvCount.setText("등록된 루틴 " + routineList.size() + "개");
+                                                        fullList.sort((a, b) ->
+                                                                Integer.compare(a.type, b.type));
+                                                        applyFilter();
                                                     }
                                                 }
                                             }
 
                                             @Override
                                             public void onFailure(Call<ItemResponse> call, Throwable t) {
-                                                synchronized (routineList) {
-                                                    routineList.add(new RoutineAdapter.RoutineItem(
+                                                synchronized (fullList) {
+                                                    fullList.add(new RoutineAdapter.RoutineItem(
                                                             data.routineName, new String[]{"알람 없음"},
                                                             dayText, data.id, finalSchedulesArr));
                                                     loadedCount[0]++;
                                                     if (loadedCount[0] == total) {
-                                                        adapter.notifyDataSetChanged();
-                                                        if (tvCount != null)
-                                                            tvCount.setText("등록된 루틴 " + routineList.size() + "개");
+                                                        fullList.sort((a, b) ->
+                                                                Integer.compare(a.type, b.type));
+                                                        applyFilter();
                                                     }
                                                 }
                                             }
@@ -176,6 +248,45 @@ public class RoutineFragment extends Fragment {
                     @Override
                     public void onFailure(Call<RoutineResponse> call, Throwable t) {
                         Toast.makeText(getContext(), "서버 연결 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void loadTodos() {
+        RetrofitClient.getRoutineApi(getContext())
+                .getAllTodos()
+                .enqueue(new Callback<TodoAllResponse>() {
+                    @Override
+                    public void onResponse(Call<TodoAllResponse> call,
+                                           Response<TodoAllResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().success) {
+
+                            fullList.removeIf(item -> item.type == RoutineAdapter.TYPE_TODO);
+
+                            for (TodoAllResponse.TodoAllData data : response.body().data) {
+                                String[] items = data.titles.toArray(new String[0]);
+                                String[] ids = data.ids != null
+                                        ? data.ids.toArray(new String[0])
+                                        : new String[0];
+
+                                String rawDate = data.targetDate.contains("T")
+                                        ? data.targetDate.substring(0, data.targetDate.indexOf("T"))
+                                        : data.targetDate;
+                                String displayDate = rawDate.replace("-", ".");
+
+                                fullList.add(new RoutineAdapter.RoutineItem(
+                                        displayDate, items, "todo_" + data.targetDate, ids));
+                            }
+
+                            fullList.sort((a, b) -> Integer.compare(a.type, b.type));
+                            applyFilter();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<TodoAllResponse> call, Throwable t) {
+                        // 실패해도 루틴 목록 유지
                     }
                 });
     }
@@ -213,7 +324,7 @@ public class RoutineFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), TodoCreateActivity.class);
                         intent.putExtra("create_mode", "direct");
                         intent.putExtra("selected_date", selectedDate);
-                        startActivity(intent);
+                        startActivityForResult(intent, 4001);
                     },
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),

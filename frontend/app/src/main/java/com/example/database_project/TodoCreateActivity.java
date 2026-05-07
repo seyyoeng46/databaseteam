@@ -1,9 +1,10 @@
 package com.example.database_project;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -12,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TodoCreateActivity extends AppCompatActivity {
 
@@ -50,24 +57,23 @@ public class TodoCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_create);
 
-        createMode = getIntent().getStringExtra("create_mode");
+        createMode   = getIntent().getStringExtra("create_mode");
         selectedDate = getIntent().getStringExtra("selected_date");
 
-        btnBack        = findViewById(R.id.btn_back);
-        etTodoInput    = findViewById(R.id.et_todo_input);
-        btnAddTodo     = findViewById(R.id.btn_add_todo);
-        rvTodo         = findViewById(R.id.rv_todo);
-        aiContainer    = findViewById(R.id.ai_container);
+        btnBack         = findViewById(R.id.btn_back);
+        etTodoInput     = findViewById(R.id.et_todo_input);
+        btnAddTodo      = findViewById(R.id.btn_add_todo);
+        rvTodo          = findViewById(R.id.rv_todo);
+        aiContainer     = findViewById(R.id.ai_container);
         directContainer = findViewById(R.id.direct_container);
-        tvSelectedDate = findViewById(R.id.tv_selected_date);
-        tvTodoCount    = findViewById(R.id.tv_todo_count);
-        dateSection    = findViewById(R.id.date_section);
+        tvSelectedDate  = findViewById(R.id.tv_selected_date);
+        tvTodoCount     = findViewById(R.id.tv_todo_count);
+        dateSection     = findViewById(R.id.date_section);
 
         // 날짜 초기 세팅
         if (selectedDate != null && !selectedDate.isEmpty()) {
             tvSelectedDate.setText(selectedDate);
         } else {
-            // 기본값: 오늘 날짜
             Calendar cal = Calendar.getInstance();
             selectedDate = String.format(Locale.getDefault(), "%04d.%02d.%02d",
                     cal.get(Calendar.YEAR),
@@ -76,15 +82,81 @@ public class TodoCreateActivity extends AppCompatActivity {
             tvSelectedDate.setText(selectedDate);
         }
 
-        // 날짜 클릭 시 DatePicker
         dateSection.setOnClickListener(v -> showDatePicker());
 
         resetTodoIfDateChanged();
-        btnBack.setOnClickListener(v -> finish());
+
+        // 뒤로가기 버튼
+        btnBack.setOnClickListener(v -> handleBack());
+
+        // 뒤로가기 제스처 처리
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        handleBack();
+                    }
+                });
 
         setupMode();
         setupRecyclerView();
         setupInputActions();
+    }
+
+    private void handleBack() {
+        if (todoList.isEmpty()) {
+            finish();
+            return;
+        }
+
+        // 날짜 형식 변환 2026.05.01 → 2026-05-01
+        String date = tvSelectedDate.getText().toString().replace(".", "-");
+
+        saveTodosToServer(date);
+    }
+
+    private void saveTodosToServer(String date) {
+        int count = todoList.size();
+        int[] savedCount = {0};
+
+        for (int i = 0; i < count; i++) {
+            Map<String, String> body = new HashMap<>();
+            body.put("title", todoList.get(i).getText());
+            body.put("content", "");
+            body.put("target_date", date);
+
+            RetrofitClient.getRoutineApi(this)
+                    .addTodo(body)
+                    .enqueue(new Callback<BasicResponse>() {
+                        @Override
+                        public void onResponse(Call<BasicResponse> call,
+                                               Response<BasicResponse> response) {
+                            savedCount[0]++;
+                            if (savedCount[0] == count) {
+                                // 모두 저장 완료
+                                String displayDate = date.replace("-", ".");
+                                String[] items = new String[todoList.size()];
+                                for (int j = 0; j < todoList.size(); j++) {
+                                    items[j] = todoList.get(j).getText();
+                                }
+                                Intent result = new Intent();
+                                result.putExtra("todo_date", displayDate);
+                                result.putExtra("todo_items", items);
+                                setResult(Activity.RESULT_OK, result);
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<BasicResponse> call, Throwable t) {
+                            savedCount[0]++;
+                            if (savedCount[0] == count) {
+                                Toast.makeText(TodoCreateActivity.this,
+                                        "저장 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
     }
 
     private void showDatePicker() {
