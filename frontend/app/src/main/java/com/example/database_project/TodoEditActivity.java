@@ -1,0 +1,163 @@
+package com.example.database_project;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class TodoEditActivity extends AppCompatActivity {
+
+    private ImageView btnBack;
+    private TextView tvSelectedDate;
+    private TextView tvTodoCount;
+    private RecyclerView rvTodo;
+
+    private String todoDate;
+    private String[] originalIds;
+
+    private final ArrayList<TodoItem> todoList = new ArrayList<>();
+    private final ArrayList<String> todoIds = new ArrayList<>();
+    private TodoAdapter todoAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_todo_edit);
+
+        todoDate    = getIntent().getStringExtra("todo_date");
+        String[] items = getIntent().getStringArrayExtra("todo_items");
+        originalIds = getIntent().getStringArrayExtra("todo_ids");
+
+        btnBack        = findViewById(R.id.btn_back);
+        rvTodo         = findViewById(R.id.rv_todo);
+        tvSelectedDate = findViewById(R.id.tv_selected_date);
+        tvTodoCount    = findViewById(R.id.tv_todo_count);
+
+        if (todoDate != null) tvSelectedDate.setText(todoDate);
+
+        // 기존 항목 로드
+        if (items != null) {
+            for (int i = 0; i < items.length; i++) {
+                todoList.add(new TodoItem(items[i], false));
+                todoIds.add(originalIds != null && i < originalIds.length
+                        ? originalIds[i] : null);
+            }
+        }
+
+        setupRecyclerView();
+
+        btnBack.setOnClickListener(v -> {
+            setResult(Activity.RESULT_OK);
+            finish();
+        });
+
+        // 뒤로가기 제스처
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                    }
+                });
+    }
+
+    private void setupRecyclerView() {
+        todoAdapter = new TodoAdapter(todoList, new TodoAdapter.OnTodoChangedListener() {
+            @Override
+            public void onTodoDeleted() {
+                updateTodoCount();
+            }
+
+            @Override
+            public void onTodoUpdated() {
+                updateTodoCount();
+            }
+        });
+
+        // 수정 시 DB에도 반영
+        todoAdapter.setOnEditListener((position, newText) -> {
+            String todoId = todoIds.get(position);
+            if (todoId != null) {
+                Map<String, String> body = new HashMap<>();
+                body.put("title", newText);
+                body.put("content", "");
+
+                RetrofitClient.getRoutineApi(this)
+                        .patchTodo(todoId, body)
+                        .enqueue(new Callback<BasicResponse>() {
+                            @Override
+                            public void onResponse(Call<BasicResponse> call,
+                                                   Response<BasicResponse> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(TodoEditActivity.this,
+                                            "수정됐어요!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<BasicResponse> call, Throwable t) {
+                                Toast.makeText(TodoEditActivity.this,
+                                        "수정 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
+        // 삭제 시 DB에서도 삭제
+        todoAdapter.setOnDeleteListener((position) -> {
+            String todoId = todoIds.get(position);
+            if (todoId != null) {
+                RetrofitClient.getRoutineApi(this)
+                        .deleteTodo(todoId)
+                        .enqueue(new Callback<BasicResponse>() {
+                            @Override
+                            public void onResponse(Call<BasicResponse> call,
+                                                   Response<BasicResponse> response) {
+                                todoList.remove(position);
+                                todoIds.remove(position);
+                                todoAdapter.notifyItemRemoved(position);
+                                todoAdapter.notifyItemRangeChanged(position, todoList.size());
+                                updateTodoCount();
+                            }
+
+                            @Override
+                            public void onFailure(Call<BasicResponse> call, Throwable t) {
+                                Toast.makeText(TodoEditActivity.this,
+                                        "삭제 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {
+                todoList.remove(position);
+                todoIds.remove(position);
+                todoAdapter.notifyItemRemoved(position);
+                todoAdapter.notifyItemRangeChanged(position, todoList.size());
+                updateTodoCount();
+            }
+        });
+
+        rvTodo.setLayoutManager(new LinearLayoutManager(this));
+        rvTodo.setAdapter(todoAdapter);
+        updateTodoCount();
+    }
+
+    private void updateTodoCount() {
+        if (tvTodoCount != null) {
+            tvTodoCount.setText("등록된 항목 " + todoList.size() + "개");
+        }
+    }
+}

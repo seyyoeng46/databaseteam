@@ -3,27 +3,98 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:layout_marginBottom="10dp">
+    android:orientation="vertical"
+    android:background="@drawable/bg_routine_card"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
 
-    <ImageView
-        android:id="@+id/iv_check"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:src="@drawable/ic_check_box_empty"
-        android:layout_marginEnd="10dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:contentDescription="체크"/>
-
-    <TextView
-        android:id="@+id/tv_content"
-        android:layout_width="0dp"
+    <!-- 상단: 날짜 + 리스트 태그 -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="리스트 내용"
-        android:textSize="14sp"
-        android:textColor="#FFFFFF"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/tv_todo_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2026.05.01"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#2C2C2A"/>
+
+        <!-- 리스트 태그 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="리스트"
+            android:textSize="11sp"
+            android:textColor="#3B6D11"
+            android:background="@drawable/bg_day_chip"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"/>
+
+    </LinearLayout>
+
+    <!-- 투두 항목 목록 -->
+    <LinearLayout
+        android:id="@+id/ll_todo_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="0dp"/>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:background="#F0EFE8"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- 하단: 수정/삭제 버튼 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/tv_todo_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="수정"
+            android:textSize="12sp"
+            android:textColor="#639922"
+            android:background="@drawable/bg_btn_edit"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:id="@+id/tv_todo_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            android:textSize="12sp"
+            android:textColor="#A32D2D"
+            android:background="@drawable/bg_btn_delete"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
 
 </LinearLayout>
