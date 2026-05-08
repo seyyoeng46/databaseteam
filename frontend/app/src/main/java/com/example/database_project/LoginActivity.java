@@ -63,8 +63,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        // 기존 캐시 강제 초기화 후 로그인
+        googleSignInClient.signOut().addOnCompleteListener(requireActivity -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
 
     @Override
