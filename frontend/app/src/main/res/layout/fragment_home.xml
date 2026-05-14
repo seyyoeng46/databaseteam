@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F7F2"
@@ -30,6 +31,17 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="14dp">
 
+                <ImageView
+                    android:id="@+id/btn_prev_day"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_back"
+                    android:tint="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="이전 날"/>
+
                 <TextView
                     android:id="@+id/tv_todo_date"
                     android:layout_width="0dp"
@@ -41,14 +53,14 @@
                     android:textColor="#FFFFFF"/>
 
                 <ImageView
-                    android:id="@+id/btn_todo_arrow"
+                    android:id="@+id/btn_next_day"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_baseline_arrow_forward_ios_24"
                     android:tint="#FFFFFF"
                     android:clickable="true"
                     android:focusable="true"
-                    android:contentDescription="자세히 보기"/>
+                    android:contentDescription="다음 날"/>
 
             </LinearLayout>
 
@@ -74,7 +86,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
-                android:background="#66BB6A"
+                android:background="#F0EFE8"
                 android:layout_marginBottom="12dp"/>
 
             <!-- 리스트 섹션 라벨 -->
@@ -130,12 +142,12 @@
                 android:id="@+id/btn_next_month"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_baseline_arrow_forward_ios_24"
                 android:background="@drawable/bg_month_btn"
-                android:padding="8dp"
                 android:clickable="true"
+                android:contentDescription="다음 달"
                 android:focusable="true"
-                android:contentDescription="다음 달"/>
+                android:padding="8dp"
+                android:src="@drawable/ic_baseline_arrow_forward_ios_24" />
 
         </LinearLayout>
 
