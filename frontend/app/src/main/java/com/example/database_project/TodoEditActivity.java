@@ -56,9 +56,12 @@ public class TodoEditActivity extends AppCompatActivity {
 
         if (todoDate != null) tvSelectedDate.setText(todoDate);
 
-        // 기존 항목 로드
+        // 기존 항목 로드 (타이틀 오름차순 정렬)
         if (items != null) {
-            for (int i = 0; i < items.length; i++) {
+            Integer[] idx = new Integer[items.length];
+            for (int i = 0; i < items.length; i++) idx[i] = i;
+            java.util.Arrays.sort(idx, (a, b) -> items[a].compareTo(items[b]));
+            for (int i : idx) {
                 todoList.add(new TodoItem(items[i], false));
                 todoIds.add(originalIds != null && i < originalIds.length
                         ? originalIds[i] : null);
@@ -224,6 +227,7 @@ public class TodoEditActivity extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().success) {
                             List<TodoResponse.TodoData> dataList = response.body().data;
+                            dataList.sort((a, b) -> a.title.compareTo(b.title));
                             todoList.clear();
                             todoIds.clear();
                             for (TodoResponse.TodoData data : dataList) {

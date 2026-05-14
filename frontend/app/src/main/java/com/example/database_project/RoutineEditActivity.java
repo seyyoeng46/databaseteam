@@ -29,6 +29,7 @@ public class RoutineEditActivity extends AppCompatActivity {
 
     private String routineId;
     private String routineName;
+    private final List<String> deletedItemIds = new ArrayList<>();
 
     public static final int REQUEST_ALARM_NEW  = 1001;
     public static final int REQUEST_ALARM_EDIT = 1002;
@@ -99,8 +100,16 @@ public class RoutineEditActivity extends AppCompatActivity {
                                            Response<ItemResponse> response) {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().data != null) {
+                            List<ItemResponse.ItemData> items = response.body().data;
+                            items.sort((a, b) -> {
+                                String timeA = a.title != null && a.title.contains(" ")
+                                        ? a.title.substring(0, a.title.indexOf(" ")) : a.title;
+                                String timeB = b.title != null && b.title.contains(" ")
+                                        ? b.title.substring(0, b.title.indexOf(" ")) : b.title;
+                                return timeA.compareTo(timeB);
+                            });
                             llAlarmList.removeAllViews();
-                            for (ItemResponse.ItemData item : response.body().data) {
+                            for (ItemResponse.ItemData item : items) {
                                 String title = item.title;
                                 String time = "";
                                 String desc = title;
@@ -140,8 +149,13 @@ public class RoutineEditActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_ALARM_EDIT);
         });
 
-        row.findViewById(R.id.tv_alarm_delete).setOnClickListener(v ->
-                llAlarmList.removeView(row));
+        row.findViewById(R.id.tv_alarm_delete).setOnClickListener(v -> {
+            String id = (String) row.getTag();
+            if (id != null && !id.isEmpty()) {
+                deletedItemIds.add(id);
+            }
+            llAlarmList.removeView(row);
+        });
 
         llAlarmList.addView(row);
     }
@@ -180,22 +194,44 @@ public class RoutineEditActivity extends AppCompatActivity {
     }
 
     private void saveAlarmItems() {
-        int count = llAlarmList.getChildCount();
-        if (count == 0) {
-            Toast.makeText(this, "수정 완료!", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
+        int remaining = llAlarmList.getChildCount();
+        int toDelete  = deletedItemIds.size();
+        int total     = remaining + toDelete;
+
+        if (total == 0) {
+            finishWithSuccess();
             return;
         }
 
-        int[] savedCount = {0};
+        int[] doneCount = {0};
 
-        for (int i = 0; i < count; i++) {
+        // UI에서 삭제된 항목 서버에서도 삭제
+        for (String itemId : deletedItemIds) {
+            RetrofitClient.getRoutineApi(this)
+                    .deleteItem(routineId, itemId)
+                    .enqueue(new Callback<BasicResponse>() {
+                        @Override
+                        public void onResponse(Call<BasicResponse> call,
+                                               Response<BasicResponse> response) {
+                            doneCount[0]++;
+                            if (doneCount[0] == total) finishWithSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Call<BasicResponse> call, Throwable t) {
+                            doneCount[0]++;
+                            if (doneCount[0] == total) finishWithSuccess();
+                        }
+                    });
+        }
+
+        // 남아 있는 항목 저장/수정
+        for (int i = 0; i < remaining; i++) {
             View row = llAlarmList.getChildAt(i);
-            String time = ((TextView) row.findViewById(R.id.tv_alarm_time)).getText().toString();
-            String desc = ((TextView) row.findViewById(R.id.tv_alarm_desc)).getText().toString();
+            String time     = ((TextView) row.findViewById(R.id.tv_alarm_time)).getText().toString();
+            String desc     = ((TextView) row.findViewById(R.id.tv_alarm_desc)).getText().toString();
             String itemName = time + " " + desc;
-            String itemId = (String) row.getTag();
+            String itemId   = (String) row.getTag();
 
             Map<String, String> itemBody = new HashMap<>();
             itemBody.put("item_name", itemName);
@@ -208,27 +244,23 @@ public class RoutineEditActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<BasicResponse> call,
                                        Response<BasicResponse> response) {
-                    savedCount[0]++;
-                    if (savedCount[0] == count) {
-                        Toast.makeText(RoutineEditActivity.this,
-                                "수정 완료!", Toast.LENGTH_SHORT).show();
-                        setResult(RESULT_OK);
-                        finish();
-                    }
+                    doneCount[0]++;
+                    if (doneCount[0] == total) finishWithSuccess();
                 }
 
                 @Override
                 public void onFailure(Call<BasicResponse> call, Throwable t) {
-                    savedCount[0]++;
-                    if (savedCount[0] == count) {
-                        Toast.makeText(RoutineEditActivity.this,
-                                "수정 완료!", Toast.LENGTH_SHORT).show();
-                        setResult(RESULT_OK);
-                        finish();
-                    }
+                    doneCount[0]++;
+                    if (doneCount[0] == total) finishWithSuccess();
                 }
             });
         }
+    }
+
+    private void finishWithSuccess() {
+        Toast.makeText(this, "수정 완료!", Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override

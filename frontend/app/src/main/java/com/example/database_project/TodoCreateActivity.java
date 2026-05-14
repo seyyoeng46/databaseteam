@@ -120,47 +120,46 @@ public class TodoCreateActivity extends AppCompatActivity {
     }
 
     private void saveTodosToServer(String date) {
-        int count = todoList.size();
-        int[] savedCount = {0};
+        saveTodosSequential(date, 0);
+    }
 
-        for (int i = 0; i < count; i++) {
-            Map<String, String> body = new HashMap<>();
-            body.put("title", todoList.get(i).getText());
-            body.put("content", "");
-            body.put("target_date", date);
-
-            RetrofitClient.getRoutineApi(this)
-                    .addTodo(body)
-                    .enqueue(new Callback<BasicResponse>() {
-                        @Override
-                        public void onResponse(Call<BasicResponse> call,
-                                               Response<BasicResponse> response) {
-                            savedCount[0]++;
-                            if (savedCount[0] == count) {
-                                // 모두 저장 완료
-                                String displayDate = date.replace("-", ".");
-                                String[] items = new String[todoList.size()];
-                                for (int j = 0; j < todoList.size(); j++) {
-                                    items[j] = todoList.get(j).getText();
-                                }
-                                Intent result = new Intent();
-                                result.putExtra("todo_date", displayDate);
-                                result.putExtra("todo_items", items);
-                                setResult(Activity.RESULT_OK, result);
-                                finish();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<BasicResponse> call, Throwable t) {
-                            savedCount[0]++;
-                            if (savedCount[0] == count) {
-                                Toast.makeText(TodoCreateActivity.this,
-                                        "저장 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+    // 순차 저장: 앞 항목이 먼저 INSERT되어 ID 순서 = 생성 순서 보장
+    private void saveTodosSequential(String date, int index) {
+        if (index >= todoList.size()) {
+            String displayDate = date.replace("-", ".");
+            String[] items = new String[todoList.size()];
+            for (int j = 0; j < todoList.size(); j++) {
+                items[j] = todoList.get(j).getText();
+            }
+            Intent result = new Intent();
+            result.putExtra("todo_date", displayDate);
+            result.putExtra("todo_items", items);
+            setResult(Activity.RESULT_OK, result);
+            finish();
+            return;
         }
+
+        Map<String, String> body = new HashMap<>();
+        body.put("title", todoList.get(index).getText());
+        body.put("content", "");
+        body.put("target_date", date);
+
+        RetrofitClient.getRoutineApi(this)
+                .addTodo(body)
+                .enqueue(new Callback<BasicResponse>() {
+                    @Override
+                    public void onResponse(Call<BasicResponse> call,
+                                           Response<BasicResponse> response) {
+                        saveTodosSequential(date, index + 1);
+                    }
+
+                    @Override
+                    public void onFailure(Call<BasicResponse> call, Throwable t) {
+                        Toast.makeText(TodoCreateActivity.this,
+                                "저장 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        saveTodosSequential(date, index + 1);
+                    }
+                });
     }
 
     private void showDatePicker() {
