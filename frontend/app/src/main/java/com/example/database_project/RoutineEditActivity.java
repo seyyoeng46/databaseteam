@@ -100,8 +100,16 @@ public class RoutineEditActivity extends AppCompatActivity {
                                            Response<ItemResponse> response) {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().data != null) {
+                            List<ItemResponse.ItemData> items = response.body().data;
+                            items.sort((a, b) -> {
+                                String timeA = a.title != null && a.title.contains(" ")
+                                        ? a.title.substring(0, a.title.indexOf(" ")) : a.title;
+                                String timeB = b.title != null && b.title.contains(" ")
+                                        ? b.title.substring(0, b.title.indexOf(" ")) : b.title;
+                                return timeA.compareTo(timeB);
+                            });
                             llAlarmList.removeAllViews();
-                            for (ItemResponse.ItemData item : response.body().data) {
+                            for (ItemResponse.ItemData item : items) {
                                 String title = item.title;
                                 String time = "";
                                 String desc = title;
