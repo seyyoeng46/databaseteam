@@ -270,6 +270,21 @@ public class RoutineFragment extends Fragment {
                                         ? data.ids.toArray(new String[0])
                                         : new String[0];
 
+                                // 타이틀 오름차순 정렬 (items·ids 쌍 유지)
+                                if (items.length > 1) {
+                                    Integer[] idx = new Integer[items.length];
+                                    for (int i = 0; i < items.length; i++) idx[i] = i;
+                                    java.util.Arrays.sort(idx, (a, b) -> items[a].compareTo(items[b]));
+                                    String[] sortedItems = new String[items.length];
+                                    String[] sortedIds   = new String[ids.length];
+                                    for (int i = 0; i < idx.length; i++) {
+                                        sortedItems[i] = items[idx[i]];
+                                        if (idx[i] < ids.length) sortedIds[i] = ids[idx[i]];
+                                    }
+                                    items = sortedItems;
+                                    ids   = sortedIds;
+                                }
+
                                 String rawDate = data.targetDate.contains("T")
                                         ? data.targetDate.substring(0, data.targetDate.indexOf("T"))
                                         : data.targetDate;
