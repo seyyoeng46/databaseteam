@@ -84,6 +84,47 @@
         android:background="#E8E8E0"
         android:layout_below="@id/date_section"/>
 
+    <!-- 하단 입력창 -->
+    <LinearLayout
+        android:id="@+id/input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:id="@+id/et_todo_input"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:hint="할 일을 입력하세요"
+            android:textSize="14sp"
+            android:textColor="#2C2C2A"
+            android:textColorHint="#B4B2A9"
+            android:background="@drawable/bg_edit_input"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/btn_add_todo"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:text="+"
+            android:textSize="22sp"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:background="@drawable/bg_btn_register"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
 
     <!-- 투두 목록 -->
     <LinearLayout

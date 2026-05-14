@@ -52,6 +52,8 @@ public class TodoCreateActivity extends AppCompatActivity {
     private static final String KEY_TODO_COUNT = "todo_count";
     private static final String KEY_TODO_DATE = "todo_date";
 
+    private boolean isSaving = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,11 +106,13 @@ public class TodoCreateActivity extends AppCompatActivity {
     }
 
     private void handleBack() {
+        if (isSaving) return;
         if (todoList.isEmpty()) {
             finish();
             return;
         }
 
+        isSaving = true;
         // 날짜 형식 변환 2026.05.01 → 2026-05-01
         String date = tvSelectedDate.getText().toString().replace(".", "-");
 

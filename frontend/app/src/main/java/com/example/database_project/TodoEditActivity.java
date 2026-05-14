@@ -2,6 +2,8 @@ package com.example.database_project;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -22,6 +25,8 @@ import retrofit2.Response;
 public class TodoEditActivity extends AppCompatActivity {
 
     private ImageView btnBack;
+    private EditText etTodoInput;
+    private TextView btnAddTodo;
     private TextView tvSelectedDate;
     private TextView tvTodoCount;
     private RecyclerView rvTodo;
@@ -46,6 +51,8 @@ public class TodoEditActivity extends AppCompatActivity {
         rvTodo         = findViewById(R.id.rv_todo);
         tvSelectedDate = findViewById(R.id.tv_selected_date);
         tvTodoCount    = findViewById(R.id.tv_todo_count);
+        etTodoInput    = findViewById(R.id.et_todo_input);
+        btnAddTodo     = findViewById(R.id.btn_add_todo);
 
         if (todoDate != null) tvSelectedDate.setText(todoDate);
 
@@ -59,6 +66,7 @@ public class TodoEditActivity extends AppCompatActivity {
         }
 
         setupRecyclerView();
+        setupInputActions();
 
         btnBack.setOnClickListener(v -> {
             setResult(Activity.RESULT_OK);
@@ -153,6 +161,86 @@ public class TodoEditActivity extends AppCompatActivity {
         rvTodo.setLayoutManager(new LinearLayoutManager(this));
         rvTodo.setAdapter(todoAdapter);
         updateTodoCount();
+    }
+
+    private void setupInputActions() {
+        btnAddTodo.setOnClickListener(v -> addTodo());
+
+        etTodoInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    actionId == EditorInfo.IME_ACTION_SEND) {
+                addTodo();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void addTodo() {
+        String input = etTodoInput.getText().toString().trim();
+        if (input.isEmpty()) {
+            Toast.makeText(this, "할 일을 입력해주세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String date = todoDate.replace(".", "-");
+        Map<String, String> body = new HashMap<>();
+        body.put("title", input);
+        body.put("content", "");
+        body.put("target_date", date);
+
+        etTodoInput.setText("");
+
+        RetrofitClient.getRoutineApi(this)
+                .addTodo(body)
+                .enqueue(new Callback<BasicResponse>() {
+                    @Override
+                    public void onResponse(Call<BasicResponse> call,
+                                           Response<BasicResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().success) {
+                            reloadTodos(date);
+                        } else {
+                            Toast.makeText(TodoEditActivity.this,
+                                    "추가 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BasicResponse> call, Throwable t) {
+                        Toast.makeText(TodoEditActivity.this,
+                                "추가 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void reloadTodos(String date) {
+        RetrofitClient.getRoutineApi(this)
+                .getTodos(date)
+                .enqueue(new Callback<TodoResponse>() {
+                    @Override
+                    public void onResponse(Call<TodoResponse> call,
+                                           Response<TodoResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().success) {
+                            List<TodoResponse.TodoData> dataList = response.body().data;
+                            todoList.clear();
+                            todoIds.clear();
+                            for (TodoResponse.TodoData data : dataList) {
+                                todoList.add(new TodoItem(data.title, data.isCompleted));
+                                todoIds.add(data.id);
+                            }
+                            todoAdapter.notifyDataSetChanged();
+                            updateTodoCount();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<TodoResponse> call, Throwable t) {
+                        Toast.makeText(TodoEditActivity.this,
+                                "불러오기 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void updateTodoCount() {
