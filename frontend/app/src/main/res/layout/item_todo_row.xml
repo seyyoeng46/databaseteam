@@ -24,6 +24,6 @@
         android:layout_weight="1"
         android:text="리스트 내용"
         android:textSize="14sp"
-        android:textColor="#2C2C2A"/>
+        android:textColor="#FFFFFF"/>
 
 </LinearLayout>

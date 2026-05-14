@@ -75,4 +75,23 @@ public interface RoutineApi {
     Call<BasicResponse> patchTodo(
             @Path("id") String id,
             @Body Map<String, String> body);
+
+    //투두 월별 출력
+    @GET("api/todo/monthly")
+    Call<MonthlyResponse> getMonthlyTodos(
+            @Query("year") int year,
+            @Query("month") int month);
+
+    // 루틴 아이템 완료 체크/해제
+    @POST("api/routine/{routineId}/items/{itemId}/complete")
+    Call<BasicResponse> completeRoutineItem(
+            @Path("routineId") String routineId,
+            @Path("itemId") String itemId,
+            @Body Map<String, Object> body);
+
+    // 날짜별 완료 여부 조회
+    @GET("api/routine/{routineId}/items/completions")
+    Call<RoutineCompletionResponse> getRoutineCompletions(
+            @Path("routineId") String routineId,
+            @Query("completed_date") String completedDate);
 }
