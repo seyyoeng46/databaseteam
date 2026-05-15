@@ -79,8 +79,10 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 String idToken = account.getIdToken();
+                String email = account.getEmail() != null ? account.getEmail() : "";
+                String photoUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "";
                 Log.d(TAG, "idToken: " + idToken);
-                sendTokenToServer(idToken);
+                sendTokenToServer(idToken, email, photoUrl);
             } catch (ApiException e) {
                 Log.e(TAG, "구글 로그인 실패: " + e.getStatusCode());
                 Toast.makeText(this, "구글 로그인 실패: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
@@ -88,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void sendTokenToServer(String idToken) {
+    private void sendTokenToServer(String idToken, String email, String photoUrl) {
         OkHttpClient client = new OkHttpClient();
 
         try {
@@ -133,6 +135,8 @@ public class LoginActivity extends AppCompatActivity {
                                     .putString("jwt_token", token)
                                     .putString("user_id", userId)
                                     .putString("username", username)
+                                    .putString("email", email)
+                                    .putString("photo_url", photoUrl)
                                     .apply();
 
                             RetrofitClient.reset();
