@@ -1,130 +1,156 @@
 package com.example.database_project;
 
-import android.os.Bundle;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TodoDetailActivity extends AppCompatActivity {
 
-    private ImageView btnBack;
-//    private ImageView btnSave;
-    private EditText etTodoInput;
-    private TextView btnAddTodo;
-    private RecyclerView rvTodo;
-
-    private View aiContainer;
-    private View directContainer;
-    private TextView tvTitle;
-
-    private String createMode;
-
-    private final ArrayList<TodoItem> todoList = new ArrayList<>();
-    private TodoAdapter todoAdapter;
+    private ApiService apiService;
+    private String selectedDate;
+    private TextView tvDateTitle;
+    private LinearLayout llRoutineContainer, llTodoContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_detail);
 
-        createMode = getIntent().getStringExtra("create_mode");
+        // 1. 초기화 및 데이터 수신
+        apiService = ApiClient.getClient(this).create(ApiService.class);
+        selectedDate = getIntent().getStringExtra("selected_date");
 
-        btnBack = findViewById(R.id.btn_back);
-//        btnSave = findViewById(R.id.btn_save);
-        etTodoInput = findViewById(R.id.et_todo_input);
-        btnAddTodo = findViewById(R.id.btn_add_todo);
-        rvTodo = findViewById(R.id.rv_todo);
-        aiContainer = findViewById(R.id.ai_container);
-        directContainer = findViewById(R.id.direct_container);
-        tvTitle = findViewById(R.id.tv_title);
+        tvDateTitle = findViewById(R.id.tv_detail_date);
+        llRoutineContainer = findViewById(R.id.ll_detail_routines);
+        llTodoContainer = findViewById(R.id.ll_detail_todos);
 
-        tvTitle.setText(TodoStorage.getTodayString() + " To-do");
+        tvDateTitle.setText(selectedDate + " 상세 보기");
 
-        btnBack.setOnClickListener(v -> finish());
+        // 2. 데이터 로드
+        loadRoutines();
+        loadTodos();
 
-        setupMode();
-        setupRecyclerView();
-        setupInputActions();
-        loadTodoList();
+        // 뒤로가기 버튼
+        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
     }
 
-    private void setupMode() {
-        if ("ai".equals(createMode)) {
-            if (aiContainer != null) aiContainer.setVisibility(View.VISIBLE);
-            if (directContainer != null) directContainer.setVisibility(View.GONE);
-            Toast.makeText(this, "AI 모드는 나중에 연결할 예정입니다", Toast.LENGTH_SHORT).show();
-        } else {
-            if (aiContainer != null) aiContainer.setVisibility(View.GONE);
-            if (directContainer != null) directContainer.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void setupRecyclerView() {
-        todoAdapter = new TodoAdapter(todoList, new TodoAdapter.OnTodoChangedListener() {
+    // --- 루틴 불러오기 (체크 기능 없음) ---
+    private void loadRoutines() {
+        apiService.getRoutines().enqueue(new Callback<RoutineResponse>() {
             @Override
-            public void onTodoDeleted() {
-                saveTodoList();
+            public void onResponse(Call<RoutineResponse> call, Response<RoutineResponse> response) {
+                llRoutineContainer.removeAllViews();
+                if (response.isSuccessful() && response.body() != null && response.body().data != null) {
+                    for (RoutineResponse.RoutineData routine : response.body().data) {
+                        fetchRoutineItems(routine);
+                    }
+                }
             }
-
             @Override
-            public void onTodoUpdated() {
-                saveTodoList();
+            public void onFailure(Call<RoutineResponse> call, Throwable t) {
+                Log.e("DETAIL_ROUTINE", "실패", t);
             }
         });
-
-        rvTodo.setLayoutManager(new LinearLayoutManager(this));
-        rvTodo.setAdapter(todoAdapter);
     }
 
-    private void setupInputActions() {
-        btnAddTodo.setOnClickListener(v -> addTodo());
-
-        etTodoInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEND) {
-                addTodo();
-                return true;
+    private void fetchRoutineItems(RoutineResponse.RoutineData routine) {
+        apiService.getRoutineItems(routine.id).enqueue(new Callback<RoutineItemResponse>() {
+            @Override
+            public void onResponse(Call<RoutineItemResponse> call, Response<RoutineItemResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    addRoutineView(routine.routineName, response.body().data);
+                }
             }
-            return false;
+            @Override
+            public void onFailure(Call<RoutineItemResponse> call, Throwable t) {}
         });
-
-//        btnSave.setOnClickListener(v -> {
-//            saveTodoList();
-//            Toast.makeText(this, "저장되었습니다", Toast.LENGTH_SHORT).show();
-//        });
     }
 
-    private void addTodo() {
-        String input = etTodoInput.getText().toString().trim();
+    private void addRoutineView(String name, List<RoutineItemResponse.RoutineItemData> items) {
+        View v = LayoutInflater.from(this).inflate(R.layout.item_todo_routine, llRoutineContainer, false);
+        TextView tvName = v.findViewById(R.id.tv_content);
+        TextView tvItems = v.findViewById(R.id.tv_time);
+        v.findViewById(R.id.iv_check).setVisibility(View.GONE); // 체크박스 숨김
 
-        if (input.isEmpty()) {
-            Toast.makeText(this, "할 일을 입력해주세요", Toast.LENGTH_SHORT).show();
-            return;
+        tvName.setTextColor(android.graphics.Color.parseColor("#2C2C2A"));
+        tvItems.setTextColor(android.graphics.Color.parseColor("#666666"));
+
+        tvName.setText(name);
+        StringBuilder sb = new StringBuilder();
+        if (items != null) {
+            for (RoutineItemResponse.RoutineItemData item : items) {
+                sb.append("• ").append(item.getDisplayName()).append("\n");
+            }
         }
-
-        todoList.add(new TodoItem(input, false));
-        todoAdapter.notifyItemInserted(todoList.size() - 1);
-        rvTodo.scrollToPosition(todoList.size() - 1);
-        etTodoInput.setText("");
-
-        saveTodoList();
+        tvItems.setText(sb.toString().trim());
+        llRoutineContainer.addView(v);
     }
 
-    private void loadTodoList() {
-        todoList.clear();
-        todoList.addAll(TodoStorage.getTodayTodos(this));
-        todoAdapter.notifyDataSetChanged();
+    // --- 투두 불러오기 (체크 기능 포함) ---
+    private void loadTodos() {
+        apiService.getTodosByDate(selectedDate).enqueue(new Callback<TodoResponse>() {
+            @Override
+            public void onResponse(Call<TodoResponse> call, Response<TodoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // [로그 추가] 서버가 보내준 데이터의 실제 개수 확인
+                    Log.d("DEBUG_COUNT", "서버에서 받은 투두 개수: " + response.body().data.size());
+
+                    llTodoContainer.removeAllViews();
+                    for (TodoResponse.TodoData todo : response.body().data) {
+                        addTodoView(todo);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<TodoResponse> call, Throwable t) {}
+        });
     }
 
-    private void saveTodoList() {
-        TodoStorage.saveTodayTodos(this, todoList);
+    private void addTodoView(TodoResponse.TodoData todo) {
+        View v = LayoutInflater.from(this).inflate(R.layout.item_todo_row, llTodoContainer, false);
+        TextView tvTitle = v.findViewById(R.id.tv_content);
+        ImageView ivCheck = v.findViewById(R.id.iv_check);
+
+        tvTitle.setTextColor(android.graphics.Color.parseColor("#2C2C2A"));
+        tvTitle.setText(todo.title != null ? todo.title : todo.content);
+
+        // 상태 업데이트 로직
+        Runnable updateUI = () -> {
+            if (todo.isCompleted) {
+                ivCheck.setImageResource(R.drawable.ic_check_box_done);
+                tvTitle.setPaintFlags(tvTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                tvTitle.setAlpha(0.5f);
+            } else {
+                ivCheck.setImageResource(R.drawable.ic_check_box_empty);
+                tvTitle.setPaintFlags(tvTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                tvTitle.setAlpha(1f);
+            }
+        };
+
+        updateUI.run();
+
+        View.OnClickListener listener = view -> {
+            todo.isCompleted = !todo.isCompleted;
+            updateUI.run();
+            // 서버에 상태 전송
+            apiService.updateTodo(todo.id, new TodoUpdateRequest(todo.isCompleted)).enqueue(new Callback<BasicResponse>() {
+                @Override public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {}
+                @Override public void onFailure(Call<BasicResponse> call, Throwable t) {}
+            });
+        };
+
+        v.setOnClickListener(listener);
+        ivCheck.setOnClickListener(listener);
+        llTodoContainer.addView(v);
     }
 }

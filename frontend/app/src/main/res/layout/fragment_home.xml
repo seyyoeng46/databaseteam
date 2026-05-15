@@ -5,7 +5,10 @@
     android:layout_height="match_parent"
     android:background="#F9F7F2"
     android:fillViewport="true"
-    android:overScrollMode="never">
+    android:overScrollMode="never"
+    android:clipToPadding="false"
+    android:paddingTop="25dp"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,12 +46,12 @@
                 <ImageView
                     android:id="@+id/btn_todo_arrow"
                     android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/ic_baseline_arrow_forward_ios_24"
-                    android:tint="#FFFFFF"
+                    android:layout_height="match_parent"
                     android:clickable="true"
+                    android:contentDescription="자세히 보기"
                     android:focusable="true"
-                    android:contentDescription="자세히 보기"/>
+                    android:src="@drawable/ic_baseline_arrow_forward_ios_24"
+                    android:tint="#FFFFFF" />
 
             </LinearLayout>
 
@@ -74,7 +77,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
-                android:background="#66BB6A"
+                android:background="#ffffff"
                 android:layout_marginBottom="12dp"/>
 
             <!-- 리스트 섹션 라벨 -->
@@ -97,23 +100,29 @@
         </LinearLayout>
 
         <!-- 월 선택 -->
+
+        <!-- 요일 라벨 -->
+
+        <!-- 잔디 달력 -->
+
+        <!-- 범례 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:layout_marginBottom="16dp">
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/btn_prev_month"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_back"
                 android:background="@drawable/bg_month_btn"
-                android:padding="8dp"
                 android:clickable="true"
+                android:contentDescription="이전 달"
                 android:focusable="true"
-                android:contentDescription="이전 달"/>
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_left" />
 
             <TextView
                 android:id="@+id/tv_month_title"
@@ -122,101 +131,161 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:text="4월"
+                android:textColor="#2C2C2A"
                 android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#2C2C2A"/>
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/btn_next_month"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_baseline_arrow_forward_ios_24"
                 android:background="@drawable/bg_month_btn"
-                android:padding="8dp"
                 android:clickable="true"
+                android:contentDescription="다음 달"
                 android:focusable="true"
-                android:contentDescription="다음 달"/>
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_right" />
+
 
         </LinearLayout>
 
-        <!-- 요일 라벨 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginStart="28dp"
             android:layout_marginBottom="6dp"
-            android:layout_marginStart="28dp">
+            android:orientation="horizontal">
 
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="일" android:textSize="11sp" android:textColor="#E57373" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="월" android:textSize="11sp" android:textColor="#888780" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="화" android:textSize="11sp" android:textColor="#888780" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="수" android:textSize="11sp" android:textColor="#888780" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="목" android:textSize="11sp" android:textColor="#888780" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="금" android:textSize="11sp" android:textColor="#888780" android:textStyle="bold"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:gravity="center"
-                android:text="토" android:textSize="11sp" android:textColor="#5C8BDA" android:textStyle="bold"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="일"
+                android:textColor="#E57373"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="월"
+                android:textColor="#888780"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="화"
+                android:textColor="#888780"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="수"
+                android:textColor="#888780"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="목"
+                android:textColor="#888780"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="금"
+                android:textColor="#888780"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="토"
+                android:textColor="#5C8BDA"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- 잔디 달력 -->
         <LinearLayout
             android:id="@+id/ll_grass_calendar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical" />
 
-        <!-- 범례 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
             android:gravity="end"
-            android:layout_marginTop="4dp">
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
                 android:text="적음"
-                android:textSize="9sp"
                 android:textColor="#888780"
-                android:layout_marginEnd="4dp"/>
+                android:textSize="9sp" />
 
-            <View android:layout_width="12dp" android:layout_height="12dp"
-                android:background="@drawable/bg_calendar_empty"
-                android:layout_marginEnd="3dp"/>
-            <View android:layout_width="12dp" android:layout_height="12dp"
-                android:background="@drawable/bg_calendar_level1"
-                android:layout_marginEnd="3dp"/>
-            <View android:layout_width="12dp" android:layout_height="12dp"
-                android:background="@drawable/bg_calendar_level2"
-                android:layout_marginEnd="3dp"/>
-            <View android:layout_width="12dp" android:layout_height="12dp"
-                android:background="@drawable/bg_calendar_level3"
-                android:layout_marginEnd="3dp"/>
-            <View android:layout_width="12dp" android:layout_height="12dp"
-                android:background="@drawable/bg_calendar_level4"
-                android:layout_marginEnd="4dp"/>
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_calendar_empty" />
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_calendar_level1" />
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_calendar_level2" />
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_calendar_level3" />
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_calendar_level4" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="많음"
-                android:textSize="9sp"
-                android:textColor="#888780"/>
+                android:textColor="#888780"
+                android:textSize="9sp" />
 
         </LinearLayout>
 

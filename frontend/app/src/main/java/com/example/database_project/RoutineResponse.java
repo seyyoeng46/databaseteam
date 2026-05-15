@@ -25,9 +25,12 @@ public class RoutineResponse {
         public String description;
 
         @SerializedName("schedules")
-        public List<Integer> schedules; // 요일 (0=일, 1=월 ... 6=토)
+        public List<Integer> schedules;
 
         @SerializedName("created_at")
         public String createdAt;
+
+        @SerializedName("is_completed")
+        public boolean isCompleted;
     }
 }

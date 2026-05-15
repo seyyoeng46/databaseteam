@@ -1,15 +1,20 @@
 package com.example.database_project;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast; // 추가
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +24,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List; // 추가
 import java.util.Locale;
+
+import retrofit2.Call; // 추가
+import retrofit2.Callback; // 추가
+import retrofit2.Response; // 추가
 
 public class DiaryFragment extends Fragment {
 
@@ -32,8 +42,10 @@ public class DiaryFragment extends Fragment {
     private ArrayList<DiaryItem> fullList = new ArrayList<>();
     private ArrayList<DiaryItem> filteredList = new ArrayList<>();
 
-    // 날짜 검색값 저장
     private String selectedFilterDate = "";
+
+    // 추가: apiService 선언
+    private ApiService apiService;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,6 +56,9 @@ public class DiaryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // 추가: apiService 초기화
+        apiService = ApiClient.getClient(requireContext()).create(ApiService.class);
 
         etSearchDiary = view.findViewById(R.id.et_search_diary);
         btnAddDiary = view.findViewById(R.id.btn_add_diary);
@@ -57,18 +72,15 @@ public class DiaryFragment extends Fragment {
         loadDiaryList();
 
         btnAddDiary.setOnClickListener(v -> showCreateDatePicker());
-
         btnCalendarSearch.setOnClickListener(v -> showSearchDatePicker());
 
         etSearchDiary.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterDiary();
+                loadDiaryList(); // 검색어 입력 시 서버에서 다시 검색
             }
-
             @Override
             public void afterTextChanged(Editable s) { }
         });
@@ -80,103 +92,148 @@ public class DiaryFragment extends Fragment {
         loadDiaryList();
     }
 
+    // DiaryFragment.java의 loadDiaryList와 추가 메서드들
+
+    // DiaryFragment.java 내의 loadDiaryList 메서드 수정
+
     private void loadDiaryList() {
-        fullList = DiaryStorage.getDiaryList(requireContext());
-        filterDiary();
+        String keyword = etSearchDiary.getText().toString().trim();
+        String finalKeyword = keyword.isEmpty() ? "%" : keyword; // 전체 조회를 위해 % 사용
+
+        apiService.searchDiaries(finalKeyword).enqueue(new Callback<DiaryListResponse>() {
+            @Override
+            public void onResponse(Call<DiaryListResponse> call, Response<DiaryListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    fullList.clear();
+                    List<DiaryListResponse.DiaryData> diaries = response.body().data;
+
+                    if (diaries != null) {
+                        for (DiaryListResponse.DiaryData data : diaries) {
+                            // 제목|내용 분리
+                            String raw = data.content;
+                            String title = "제목 없음";
+                            String content = (raw != null) ? raw : "";
+                            if (raw != null && raw.contains("|")) {
+                                String[] parts = raw.split("\\|", 2);
+                                title = parts[0];
+                                content = parts[1];
+                            }
+
+                            DiaryItem item = new DiaryItem(
+                                    data.id,
+                                    formatServerDate(data.targetDate),
+                                    title,
+                                    content,
+                                    new ArrayList<>()
+                            );
+                            fullList.add(item);
+
+                            // 여기서 태그를 가져옵니다.
+                            fetchTagsFromServer(item);
+                        }
+                    }
+                    updateUI();
+                }
+            }
+            @Override
+            public void onFailure(Call<DiaryListResponse> call, Throwable t) {
+                Log.e("DiaryFragment", "로드 실패");
+            }
+        });
     }
 
-    private void filterDiary() {
+    // DiaryFragment.java 수정
+    private void fetchTagsFromServer(DiaryItem item) {
+        String dateQuery = item.getDate().replace(".", "-");
+
+        apiService.getTodosByDate(dateQuery).enqueue(new Callback<TodoResponse>() {
+            @Override
+            public void onResponse(Call<TodoResponse> call, Response<TodoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ArrayList<String> tags = new ArrayList<>();
+                    List<TodoResponse.TodoData> todos = response.body().data;
+                    if (todos != null) {
+                        for (TodoResponse.TodoData todo : todos) {
+                            // [수정] 완료 안 된 투두도 카드에 뜨는지 확인하기 위해 if문 제거
+                            tags.add(todo.title);
+                            Log.d("TAG_TEST", "찾은 투두: " + todo.title + " (날짜: " + dateQuery + ")");
+                        }
+                    }
+                    item.setTags(tags);
+                    adapter.notifyDataSetChanged(); // 이 명령어가 있어야 화면에 태그가 "짠" 하고 나타납니다.
+                }
+            }
+            @Override
+            public void onFailure(Call<TodoResponse> call, Throwable t) { }
+        });
+    }
+
+    private void updateUI() {
         filteredList.clear();
-
-        String keyword = etSearchDiary.getText().toString().trim().toLowerCase(Locale.getDefault());
-
         for (DiaryItem item : fullList) {
-            boolean matchKeyword = keyword.isEmpty()
-                    || containsIgnoreCase(item.getTitle(), keyword)
-                    || containsIgnoreCase(item.getContent(), keyword)
-                    || containsIgnoreCase(item.getDate(), keyword)
-                    || hasMatchingTag(item.getTags(), keyword);
-
-            boolean matchDate = selectedFilterDate.isEmpty()
-                    || selectedFilterDate.equals(item.getDate());
-
-            if (matchKeyword && matchDate) {
+            boolean matchDate = selectedFilterDate.isEmpty() || selectedFilterDate.equals(item.getDate());
+            if (matchDate) {
                 filteredList.add(item);
             }
         }
-
         adapter.setDiaryList(filteredList);
     }
 
-    private boolean containsIgnoreCase(String value, String keyword) {
-        return value != null && value.toLowerCase(Locale.getDefault()).contains(keyword);
-    }
+    private String formatServerDate(String serverDate) {
+        if (serverDate == null || serverDate.isEmpty()) return "";
 
-    private boolean hasMatchingTag(ArrayList<String> tags, String keyword) {
-        if (tags == null) return false;
-
-        for (String tag : tags) {
-            if (tag != null && tag.toLowerCase(Locale.getDefault()).contains(keyword)) {
-                return true;
+        try {
+            // 서버에서 오는 UTC 형식을 파싱 (소수점 초 단위(.000Z)까지 포함될 수 있으므로 유연하게 처리)
+            // 백엔드에서 주는 ISO 8601 형식 대응
+            SimpleDateFormat sdfInput = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            if (serverDate.contains("T")) {
+                sdfInput = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                sdfInput.setTimeZone(TimeZone.getTimeZone("UTC"));
             }
+
+            Date date = sdfInput.parse(serverDate);
+
+            // 사용자의 폰 시간대(KST)로 변환하여 출력
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+            sdfOutput.setTimeZone(TimeZone.getDefault());
+
+            return sdfOutput.format(date);
+        } catch (Exception e) {
+            // 실패 시 문자열만이라도 변환
+            return serverDate.split("T")[0].replace("-", ".");
         }
-        return false;
     }
 
-    // 일기 생성용 날짜 선택
     private void showCreateDatePicker() {
         Calendar calendar = Calendar.getInstance();
-
         DatePickerDialog dialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
-                    String selectedDate = String.format(
-                            Locale.getDefault(),
-                            "%04d.%02d.%02d",
-                            year, month + 1, dayOfMonth
-                    );
-
+                    String selectedDate = String.format(Locale.getDefault(), "%04d.%02d.%02d", year, month + 1, dayOfMonth);
                     Intent intent = new Intent(requireContext(), DiaryWriteActivity.class);
                     intent.putExtra("mode", "create");
                     intent.putExtra("selected_date", selectedDate);
                     startActivity(intent);
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
         );
-
         dialog.show();
     }
 
-    // 검색용 날짜 선택
     private void showSearchDatePicker() {
         Calendar calendar = Calendar.getInstance();
-
         DatePickerDialog dialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
-                    selectedFilterDate = String.format(
-                            Locale.getDefault(),
-                            "%04d.%02d.%02d",
-                            year, month + 1, dayOfMonth
-                    );
-
-                    // 검색창에도 같이 보여주고 싶으면 주석 해제
-                    // etSearchDiary.setText(selectedFilterDate);
-
-                    filterDiary();
+                    selectedFilterDate = String.format(Locale.getDefault(), "%04d.%02d.%02d", year, month + 1, dayOfMonth);
+                    updateUI();
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
         );
-
         dialog.setButton(DatePickerDialog.BUTTON_NEGATIVE, "초기화", (d, which) -> {
             selectedFilterDate = "";
-            filterDiary();
+            updateUI();
         });
-
         dialog.show();
     }
 }

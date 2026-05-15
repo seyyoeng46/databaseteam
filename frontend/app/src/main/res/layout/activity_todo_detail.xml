@@ -1,109 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0EB"
     android:orientation="vertical"
+    android:background="#F9F7F2"
     android:padding="20dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_marginBottom="20dp">
 
         <ImageView
             android:id="@+id/btn_back"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_back"
-            app:tint="#4F8F4F" />
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_chevron_left"
+            android:layout_centerVertical="true"/>
 
         <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="0dp"
+            android:id="@+id/tv_detail_date"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:text="오늘의 To-do"
-            android:textColor="#4F8F4F"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:layout_centerInParent="true"
+            android:text="날짜 상세 보기"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2C2C2A"/>
+    </RelativeLayout>
 
-<!--        <ImageView-->
-<!--            android:id="@+id/btn_save"-->
-<!--            android:layout_width="28dp"-->
-<!--            android:layout_height="28dp"-->
-<!--            android:src="@android:drawable/ic_menu_save"-->
-<!--            android:tint="#4F8F4F" />-->
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ai_container"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="AI 추천 기능은 나중에 연결될 예정입니다."
-            android:textColor="#4F8F4F"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/direct_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/et_todo_input"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:drawable/edit_text"
-                android:hint="할 일을 입력하세요"
-                android:imeOptions="actionDone"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textColor="#222222"
-                android:textColorHint="#888888" />
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/btn_add_todo"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/rounded_bg"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="추가"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content"
+                android:text="고정 루틴"
+                android:textColor="#4DB6AC"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <LinearLayout
+                android:id="@+id/ll_detail_routines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_routine_card"
+                android:padding="15dp"
+                android:layout_marginBottom="25dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="할 일 목록 (To-do)"
+                android:textColor="#4DB6AC"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <LinearLayout
+                android:id="@+id/ll_detail_todos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:padding="15dp"/>
+
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_todo"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1" />
-    </LinearLayout>
-
+    </ScrollView>
 </LinearLayout>

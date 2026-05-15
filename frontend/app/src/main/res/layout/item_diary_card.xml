@@ -20,12 +20,19 @@
         android:layout_marginBottom="6dp"/>
 
     <!-- 태그 목록 -->
-    <LinearLayout
-        android:id="@+id/layout_diary_tags"
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp"/>
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/layout_diary_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"/>
+    </HorizontalScrollView>
 
     <!-- 일기 제목 -->
     <TextView

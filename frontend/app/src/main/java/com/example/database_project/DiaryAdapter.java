@@ -9,11 +9,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast; // 추가
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+
+import retrofit2.Call; // 추가
+import retrofit2.Callback; // 추가
+import retrofit2.Response; // 추가
 
 public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder> {
 
@@ -49,41 +54,40 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
 
         holder.tvTitle.setText(item.getTitle());
         holder.tvDate.setText(item.getDate());
+        holder.tvContent.setText(item.getContent());
 
-        String preview = item.getContent();
-        if (preview.length() > 45) {
-            preview = preview.substring(0, 45) + "...";
-        }
-        holder.tvContent.setText(preview);
-
+        // 태그 그리기
         holder.layoutTags.removeAllViews();
         ArrayList<String> tags = item.getTags();
 
-        if (tags != null) {
+        if (tags != null && !tags.isEmpty()) {
+            holder.layoutTags.setVisibility(View.VISIBLE);
             for (String tag : tags) {
                 TextView chip = new TextView(context);
-                chip.setText(tag);
-                chip.setTextSize(13);
-                chip.setTextColor(0xFFFFFFFF);
-                chip.setBackgroundResource(R.drawable.bg_tag_gray);
-                chip.setPadding(26, 12, 26, 12);
+                chip.setText("#" + tag); // 태그임을 알 수 있게 # 추가
+                chip.setTextSize(11);
+                chip.setTextColor(0xFFFFFFFF); // 흰색 글자
+                chip.setBackgroundResource(R.drawable.bg_tag_gray); // 회색 배경
+                chip.setPadding(20, 10, 20, 10);
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                 );
                 params.rightMargin = 12;
-                params.bottomMargin = 12;
                 chip.setLayoutParams(params);
-
                 holder.layoutTags.addView(chip);
             }
+        } else {
+            // 태그가 없으면 공간을 숨김
+            holder.layoutTags.setVisibility(View.GONE);
         }
 
         holder.btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(context, DiaryWriteActivity.class);
             intent.putExtra("mode", "edit");
-            intent.putExtra("diary_id", item.getId());
+            intent.putExtra("diary_id", item.getId());     // 저장/수정용 ID
+            intent.putExtra("diary_date", item.getDate()); // 조회용 날짜 (yyyy.MM.dd)
             context.startActivity(intent);
         });
 
@@ -92,8 +96,21 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
                     .setTitle("일기 삭제")
                     .setMessage("이 일기를 삭제할까요?")
                     .setPositiveButton("삭제", (dialog, which) -> {
-                        DiaryStorage.deleteDiary(context, item.getId());
-                        if (listener != null) listener.onDiaryChanged();
+                        // 서버 API 호출로 삭제
+                        ApiService apiService = ApiClient.getClient(context).create(ApiService.class);
+                        apiService.deleteDiary(Integer.parseInt(item.getId())).enqueue(new Callback<DiaryDeleteResponse>() {
+                            @Override
+                            public void onResponse(Call<DiaryDeleteResponse> call, Response<DiaryDeleteResponse> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(context, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                    if (listener != null) listener.onDiaryChanged();
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<DiaryDeleteResponse> call, Throwable t) {
+                                Toast.makeText(context, "삭제 실패", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     })
                     .setNegativeButton("취소", null)
                     .show();

@@ -32,9 +32,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "LoginActivity";
-    private static final String WEB_CLIENT_ID = "553427997682-p9dssaiv0ml6c46uibp3adkc3edn0mp8.apps.googleusercontent.com";
-    private static final String SERVER_URL = "http://10.0.2.2:3000/api/auth/google";
-
+    private static final String WEB_CLIENT_ID = "409230075283-rjd9h77off3p09slc00a9tq7ukj7c3ko.apps.googleusercontent.com";
+    private static final String SERVER_URL =
+            "http://10.0.2.2:3000/api/auth/google";
+//    private static final String SERVER_URL =
+//        "https://planner-backend-hgty.onrender.com/api/auth/google";
     private GoogleSignInClient googleSignInClient;
 
     @Override

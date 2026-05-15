@@ -46,26 +46,28 @@ public class RoutineFragment extends Fragment {
         tvRoutineCount = view.findViewById(R.id.tv_routine_count);
         tvFilterLabel  = view.findViewById(R.id.tv_filter_label);
 
+        // 1. onCreateView 내부의 adapter 생성 부분 수정
         adapter = new RoutineAdapter(getContext(), routineList,
-                () -> {
-                    fullList.removeIf(item -> !routineList.contains(item));
-                    updateCount();
+                item -> { // [수정] () -> 에서 item -> 로 변경 (루틴 삭제 시)
+                    // 실제 삭제 확인 다이얼로그 호출
+                    showRoutineDeleteConfirmDialog(item);
                 },
-                item -> {
+                item -> { // 루틴 수정 시
                     Intent intent = new Intent(getActivity(), RoutineEditActivity.class);
                     intent.putExtra("routine_id", item.id);
                     intent.putExtra("routine_name", item.name);
-                    int[] schedules = item.schedules != null ? item.schedules : new int[0];
-                    intent.putExtra("routine_schedules", schedules);
+                    intent.putExtra("routine_schedules", item.schedules != null ? item.schedules : new int[0]);
                     startActivityForResult(intent, 3001);
                 },
-                item -> {
-                    // 투두 수정 → Fragment에서 직접 startActivityForResult
+                item -> { // 투두 수정 시 (카드 하단 수정 버튼)
                     Intent intent = new Intent(getActivity(), TodoEditActivity.class);
                     intent.putExtra("todo_date", item.name);
                     intent.putExtra("todo_items", item.alarms);
                     intent.putExtra("todo_ids", item.todoIds);
                     startActivityForResult(intent, 5001);
+                },
+                item -> { // 투두 삭제 시 (카드 하단 삭제 버튼)
+                    showTodoDeleteConfirmDialog(item);
                 }
         );
         rv.setAdapter(adapter);
@@ -357,5 +359,66 @@ public class RoutineFragment extends Fragment {
         if (dialog.getWindow() != null)
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.show();
+    }
+
+    private void showTodoDeleteConfirmDialog(RoutineAdapter.RoutineItem item) {
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("삭제 확인")
+                .setMessage(item.name + "의 모든 투두 항목을 삭제할까요?")
+                .setPositiveButton("삭제", (dialog, which) -> {
+                    if (item.todoIds != null) deleteTodoItems(item.todoIds);
+                })
+                .setNegativeButton("취소", null).show();
+    }
+
+    private void deleteTodoItems(String[] ids) {
+        int[] deleteCount = {0};
+        for (String id : ids) {
+            RetrofitClient.getRoutineApi(getContext()).deleteTodo(id).enqueue(new retrofit2.Callback<BasicResponse>() {
+                @Override
+                public void onResponse(retrofit2.Call<BasicResponse> call, retrofit2.Response<BasicResponse> response) {
+                    deleteCount[0]++;
+                    if (deleteCount[0] == ids.length) {
+                        Toast.makeText(getContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                        loadTodos(); // 목록 새로고침
+                    }
+                }
+                @Override public void onFailure(retrofit2.Call<BasicResponse> call, Throwable t) {}
+            });
+        }
+    }
+
+    // 루틴 삭제 확인 다이얼로그
+    private void showRoutineDeleteConfirmDialog(RoutineAdapter.RoutineItem item) {
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("루틴 삭제")
+                .setMessage("'" + item.name + "' 루틴을 삭제할까요?\n관련된 상세 항목도 모두 삭제됩니다.")
+                .setPositiveButton("삭제", (dialog, which) -> {
+                    deleteRoutineFromServer(item.id);
+                })
+                .setNegativeButton("취소", null)
+                .show();
+    }
+
+    // 서버에서 루틴 삭제 실행
+    private void deleteRoutineFromServer(String routineId) {
+        RetrofitClient.getRoutineApi(getContext())
+                .deleteRoutine(routineId) // RoutineApi에 정의된 deleteRoutine 호출
+                .enqueue(new Callback<BasicResponse>() {
+                    @Override
+                    public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(getContext(), "루틴이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                            loadRoutines(); // 목록 새로고침
+                        } else {
+                            Toast.makeText(getContext(), "삭제 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BasicResponse> call, Throwable t) {
+                        Toast.makeText(getContext(), "네트워크 오류", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
