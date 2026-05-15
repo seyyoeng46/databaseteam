@@ -94,4 +94,22 @@ public interface RoutineApi {
     Call<RoutineCompletionResponse> getRoutineCompletions(
             @Path("routineId") String routineId,
             @Query("completed_date") String completedDate);
+
+    // 일기 전체 목록 조회
+    @GET("api/diary/all")
+    Call<DiaryListResponse> getAllDiaries();
+
+    // 일기 작성
+    @POST("api/diary")
+    Call<BasicResponse> createDiary(@Body Map<String, Object> body);
+
+    // 일기 수정
+    @PATCH("api/diary/{id}")
+    Call<BasicResponse> updateDiary(
+            @Path("id") String id,
+            @Body Map<String, Object> body);
+
+    // 일기 삭제
+    @DELETE("api/diary/{id}")
+    Call<BasicResponse> deleteDiary(@Path("id") String id);
 }

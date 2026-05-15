@@ -151,6 +151,14 @@ public class HomeFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().data != null) {
 
+                            response.body().data.sort((a, b) -> {
+                                String timeA = a.title != null && a.title.contains(" ")
+                                        ? a.title.substring(0, a.title.indexOf(" ")) : a.title;
+                                String timeB = b.title != null && b.title.contains(" ")
+                                        ? b.title.substring(0, b.title.indexOf(" ")) : b.title;
+                                return timeA.compareTo(timeB);
+                            });
+
                             TextView tvHeader = new TextView(requireContext());
                             tvHeader.setText(routineName);
                             tvHeader.setTextSize(11f);
@@ -192,7 +200,9 @@ public class HomeFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().success) {
                             llList.removeAllViews();
-                            for (TodoResponse.TodoData item : response.body().data) {
+                            java.util.List<TodoResponse.TodoData> sorted = response.body().data;
+                            sorted.sort((a, b) -> a.title.compareTo(b.title));
+                            for (TodoResponse.TodoData item : sorted) {
                                 addListItem(myInflater, llList,
                                         item.id, item.title, item.isCompleted);
                             }
@@ -351,15 +361,20 @@ public class HomeFragment extends Fragment {
     private void updateCheckStyle(TextView tvContent, ImageView ivCheck, boolean checked) {
         if (checked) {
             ivCheck.setImageResource(R.drawable.ic_check_box_done);
+            tvContent.getPaint().setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+            tvContent.getPaint().setStrokeWidth(1.5f);
             tvContent.setPaintFlags(tvContent.getPaintFlags() |
                     android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             tvContent.setAlpha(0.65f);
         } else {
             ivCheck.setImageResource(R.drawable.ic_check_box_empty);
+            tvContent.getPaint().setStyle(android.graphics.Paint.Style.FILL);
+            tvContent.getPaint().setStrokeWidth(0f);
             tvContent.setPaintFlags(tvContent.getPaintFlags() &
                     ~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             tvContent.setAlpha(1.0f);
         }
+        tvContent.invalidate();
     }
 
     private void drawGrassCalendar(LinearLayout container, TextView tvMonth) {
