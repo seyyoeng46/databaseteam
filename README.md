@@ -32,7 +32,7 @@ ADHD 사용자는 **"해야 할 것을 아는 것"** 이 아니라 **"아는 것
 ```
 databaseteam/
 ├── frontend/          # Android 앱 (Java, Android Studio)
-└── planner-backend/   # REST API 서버 (Node.js, Express, PostgreSQL)
+└── backend/   # REST API 서버 (Node.js, Express, PostgreSQL)
 ```
 
 ---
@@ -215,7 +215,7 @@ CREATE TABLE DIARIES (
 ### Backend
 
 ```bash
-cd planner-backend
+cd backend
 npm install
 ```
 
@@ -254,11 +254,3 @@ node server.js
 | 마이페이지 구글 계정 연동 | ✅ 완료 |
 | AI 루틴 자동 생성 | 🔧 개발 진행 중 |
 
----
-
-## 👥 팀원 및 브랜치
-
-| 브랜치 | 담당 |
-|--------|------|
-| `main` | 통합 브랜치 |
-| `hyungjin` | 홈 · 마이페이지 · 일기 기능 |
