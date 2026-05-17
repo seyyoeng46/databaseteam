@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 580" width="620" height="580" font-family="'Segoe UI', Arial, sans-serif">
+
+  <!-- Background -->
+  <rect width="620" height="580" fill="#F8F9FA" rx="12"/>
+
+  <!-- ===== Android App Box ===== -->
+  <rect x="160" y="24" width="300" height="80" rx="14" fill="#4CAF50" filter="url(#shadow)"/>
+  <text x="310" y="56" text-anchor="middle" fill="white" font-size="15" font-weight="bold">📱 Android 앱</text>
+  <text x="310" y="76" text-anchor="middle" fill="#E8F5E9" font-size="12">Java  |  Android Studio</text>
+  <text x="310" y="95" text-anchor="middle" fill="#C8E6C9" font-size="11">Retrofit2 · Glide · Google Sign-In SDK</text>
+
+  <!-- Arrow 1: Android → Server -->
+  <line x1="310" y1="104" x2="310" y2="158" stroke="#90A4AE" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <polygon points="302,154 310,170 318,154" fill="#90A4AE"/>
+  <rect x="180" y="120" width="260" height="22" rx="6" fill="#ECEFF1"/>
+  <text x="310" y="135" text-anchor="middle" fill="#546E7A" font-size="11" font-weight="bold">Retrofit2 HTTP 요청</text>
+
+  <!-- Arrow label reverse -->
+  <line x1="270" y1="115" x2="270" y2="115"/>
+
+  <!-- ===== Express Server Box ===== -->
+  <rect x="60" y="170" width="500" height="220" rx="14" fill="#1565C0" filter="url(#shadow)"/>
+  <text x="310" y="198" text-anchor="middle" fill="white" font-size="15" font-weight="bold">⚙️  Node.js + Express 서버</text>
+
+  <!-- JWT badge -->
+  <rect x="215" y="207" width="190" height="22" rx="8" fill="#0D47A1"/>
+  <text x="310" y="222" text-anchor="middle" fill="#90CAF9" font-size="11">🔐 JWT 인증 미들웨어 (requireAuth)</text>
+
+  <!-- API Route cards -->
+  <!-- /api/auth -->
+  <rect x="80" y="240" width="200" height="36" rx="8" fill="#1976D2"/>
+  <text x="90" y="257" fill="#82B1FF" font-size="11" font-weight="bold">/api/auth</text>
+  <text x="90" y="271" fill="#BBDEFB" font-size="10">Google OAuth 검증 · JWT 발급</text>
+
+  <!-- /api/routine -->
+  <rect x="292" y="240" width="248" height="36" rx="8" fill="#1976D2"/>
+  <text x="302" y="257" fill="#82B1FF" font-size="11" font-weight="bold">/api/routine</text>
+  <text x="302" y="271" fill="#BBDEFB" font-size="10">루틴 CRUD · 아이템 · 완료 체크</text>
+
+  <!-- /api/todo -->
+  <rect x="80" y="286" width="200" height="36" rx="8" fill="#1976D2"/>
+  <text x="90" y="303" fill="#82B1FF" font-size="11" font-weight="bold">/api/todo</text>
+  <text x="90" y="317" fill="#BBDEFB" font-size="10">날짜별·월별 투두 CRUD</text>
+
+  <!-- /api/diary -->
+  <rect x="292" y="286" width="248" height="36" rx="8" fill="#1976D2"/>
+  <text x="302" y="303" fill="#82B1FF" font-size="11" font-weight="bold">/api/diary</text>
+  <text x="302" y="317" fill="#BBDEFB" font-size="10">일기 작성·수정·삭제·검색</text>
+
+  <!-- /api/user -->
+  <rect x="186" y="332" width="248" height="36" rx="8" fill="#1976D2"/>
+  <text x="196" y="349" fill="#82B1FF" font-size="11" font-weight="bold">/api/user</text>
+  <text x="196" y="363" fill="#BBDEFB" font-size="10">사용자 정보 조회·수정·탈퇴</text>
+
+  <!-- Arrow 2: Server → DB -->
+  <line x1="310" y1="390" x2="310" y2="442" stroke="#90A4AE" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <polygon points="302,438 310,454 318,438" fill="#90A4AE"/>
+  <rect x="200" y="404" width="220" height="22" rx="6" fill="#ECEFF1"/>
+  <text x="310" y="419" text-anchor="middle" fill="#546E7A" font-size="11" font-weight="bold">node-postgres (pg) 쿼리</text>
+
+  <!-- ===== PostgreSQL Box ===== -->
+  <rect x="80" y="456" width="460" height="100" rx="14" fill="#6A1B9A" filter="url(#shadow)"/>
+  <text x="310" y="484" text-anchor="middle" fill="white" font-size="15" font-weight="bold">🗄️  PostgreSQL</text>
+
+  <!-- Table chips -->
+  <rect x="96" y="494" width="90" height="28" rx="8" fill="#7B1FA2"/>
+  <text x="141" y="512" text-anchor="middle" fill="#E1BEE7" font-size="11">USERS</text>
+
+  <rect x="196" y="494" width="90" height="28" rx="8" fill="#7B1FA2"/>
+  <text x="241" y="512" text-anchor="middle" fill="#E1BEE7" font-size="11">ROUTINES</text>
+
+  <rect x="296" y="494" width="90" height="28" rx="8" fill="#7B1FA2"/>
+  <text x="341" y="512" text-anchor="middle" fill="#E1BEE7" font-size="11">TODOS</text>
+
+  <rect x="396" y="494" width="90" height="28" rx="8" fill="#7B1FA2"/>
+  <text x="441" y="512" text-anchor="middle" fill="#E1BEE7" font-size="11">DIARIES</text>
+
+  <text x="310" y="543" text-anchor="middle" fill="#CE93D8" font-size="10">+ routine_schedules · routine_items · routine_completions</text>
+
+  <!-- Drop shadow filter -->
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#00000022"/>
+    </filter>
+  </defs>
+
+</svg>
