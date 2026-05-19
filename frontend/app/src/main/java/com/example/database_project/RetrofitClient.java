@@ -3,6 +3,8 @@ package com.example.database_project;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,6 +25,9 @@ public class RetrofitClient {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(90, TimeUnit.SECONDS)   // Gemini AI 응답 대기
+                    .writeTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(chain -> {
                         Request request = chain.request().newBuilder()
                                 .addHeader("Authorization", "Bearer " + token)

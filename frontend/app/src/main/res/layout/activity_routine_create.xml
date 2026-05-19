@@ -13,6 +13,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
+        android:background="#F9F7F2"
         android:layout_alignParentTop="true">
 
         <ImageView
@@ -26,79 +27,167 @@
             android:contentDescription="뒤로가기"
             android:layout_marginEnd="8dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="루틴 만들기"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#2C2C2A"/>
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI 루틴 만들기"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2C2C2A"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="원하는 루틴을 입력하거나 사진을 첨부하세요"
+                android:textSize="11sp"
+                android:textColor="#888780"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <!-- 하단 입력창 (바닥에 고정) -->
+    <!-- 하단 입력 영역 -->
     <LinearLayout
-        android:id="@+id/input_bar"
+        android:id="@+id/input_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="#FFFFFF"
-        android:padding="10dp"
-        android:gravity="center_vertical"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:elevation="8dp">
 
-        <!-- + 버튼 -->
-        <TextView
-            android:id="@+id/btn_plus"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:text="+"
-            android:textSize="22sp"
-            android:textColor="#4CAF50"
-            android:gravity="center"
-            android:background="@drawable/bg_plus_button"
-            android:layout_marginEnd="8dp"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <!-- 입력창 -->
-        <EditText
-            android:id="@+id/et_input"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:hint="AI에게 루틴 생성시키기"
-            android:textSize="13sp"
-            android:textColor="#2C2C2A"
-            android:textColorHint="#B4B2A9"
-            android:background="@drawable/bg_input_field"
+        <!-- 이미지 미리보기 (선택 시 표시) -->
+        <LinearLayout
+            android:id="@+id/layout_image_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
-            android:layout_marginEnd="8dp"
-            android:inputType="text"
-            android:maxLines="1"/>
+            android:paddingTop="8dp"
+            android:visibility="gone">
 
-        <!-- 마이크 버튼 -->
-        <ImageView
-            android:id="@+id/btn_mic"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_btn_speak_now"
-            android:background="@drawable/bg_input_field"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:contentDescription="음성 입력"/>
+            <androidx.cardview.widget.CardView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/iv_thumbnail"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:scaleType="centerCrop"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="사진이 첨부되었어요"
+                android:textSize="12sp"
+                android:textColor="#888780"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:id="@+id/btn_remove_image"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:text="✕"
+                android:textSize="13sp"
+                android:textColor="#888780"
+                android:gravity="center"
+                android:background="@drawable/bg_day_unselected"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:id="@+id/divider_preview"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#E8E8E0"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"/>
+
+        <!-- 입력창 row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <!-- 사진 첨부 버튼 -->
+            <TextView
+                android:id="@+id/btn_plus"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="+"
+                android:textSize="22sp"
+                android:textColor="#4CAF50"
+                android:gravity="center"
+                android:background="@drawable/bg_day_unselected"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- 텍스트 입력창 -->
+            <EditText
+                android:id="@+id/et_input"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:hint="원하는 루틴을 입력하세요"
+                android:textSize="13sp"
+                android:textColor="#2C2C2A"
+                android:textColorHint="#B4B2A9"
+                android:background="@drawable/bg_edit_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:layout_marginEnd="8dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:imeOptions="actionSend"/>
+
+            <!-- 전송 버튼 -->
+            <TextView
+                android:id="@+id/btn_send"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="→"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:background="@drawable/bg_btn_register"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <!-- 채팅 메시지 영역 (헤더 아래 ~ 입력창 위) -->
+    <!-- 채팅 RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header"
-        android:layout_above="@id/input_bar"
+        android:layout_above="@id/input_area"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="8dp"

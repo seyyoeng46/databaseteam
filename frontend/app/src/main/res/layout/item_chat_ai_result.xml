@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="top"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <!-- AI 아바타 -->
+    <TextView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:text="🤖"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:background="@drawable/bg_day_unselected"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="2dp"/>
+
+    <!-- 결과 카드 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/bg_chat_ai"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="생성된 루틴"
+            android:textSize="11sp"
+            android:textColor="#4CAF50"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:id="@+id/tv_routine_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#2C2C2A"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:id="@+id/layout_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+        <!-- 등록하기 버튼 -->
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="루틴 등록하기"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_btn_register"
+            android:stateListAnimator="@null"
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

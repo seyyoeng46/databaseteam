@@ -112,4 +112,8 @@ public interface RoutineApi {
     // 일기 삭제
     @DELETE("api/diary/{id}")
     Call<BasicResponse> deleteDiary(@Path("id") String id);
+
+    // AI 이미지로 루틴 생성
+    @POST("api/routine/from-image")
+    Call<AiRoutineResponse> createRoutineFromImage(@Body Map<String, String> body);
 }

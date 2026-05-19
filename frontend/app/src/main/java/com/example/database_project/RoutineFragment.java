@@ -361,7 +361,9 @@ public class RoutineFragment extends Fragment {
 
         sheetView.findViewById(R.id.option_ai).setOnClickListener(v -> {
             dialog.dismiss();
-            startActivity(new Intent(getActivity(), RoutineCreateActivity.class));
+            startActivityForResult(
+                    new Intent(getActivity(), RoutineCreateActivity.class),
+                    REQUEST_CREATE_ROUTINE);
         });
 
         sheetView.findViewById(R.id.option_manual).setOnClickListener(v -> {
