@@ -1,10 +1,10 @@
-# 📓 ADHD를 위한 일상 플래너
+# ADHD를 위한 일상 플래너
 
 > 루틴 · 투두 · 일기를 하나로 통합한 Android 일정 관리 앱
 
 ---
 
-## 📌 프로젝트 개요
+## 프로젝트 개요
 
 ### 개발 배경
 
@@ -13,63 +13,67 @@ ADHD 사용자는 **"해야 할 것을 아는 것"** 이 아니라 **"아는 것
 > *"ADHD is a disorder of performance — of doing what you know rather than knowing what to do."*
 > — Russell A. Barkley
 
-기존 루틴·할 일 앱들은 앱이 분리되어 있어 전환 피로가 크고, 하루를 돌아볼 수 있는 기록 기능도 부족합니다.  
+기존 루틴·할 일 앱들은 분리되어 있어 전환 피로가 크고, 하루를 돌아볼 수 있는 기록 기능도 부족합니다.  
 이 앱은 **루틴 + 투두 + 일기를 하나로 통합**하여 인지 부담을 최소화하고 실행력을 높이는 것을 목표로 합니다.
 
 ### 팀 구성
 
-| 학번 | 이름 |
-|------|------|
-| 20221726 | 전형진 | Frontend | 
-| 20241937 | 이서영 | Frontend | 
-| 20221767 | 이세호 | Backend | 
-| 20222206 | 정현민 | Backend | 
+| 학번 | 이름 | 역할 |
+|------|------|------|
+| 20221726 | 전형진 | Frontend |
+| 20241937 | 이서영 | Frontend |
+| 20221767 | 이세호 | Backend |
+| 20222206 | 정현민 | Backend |
 
 ---
 
-## 🗂️ 프로젝트 구조
+## 프로젝트 구조
 
 ```
 databaseteam/
-├── frontend/          # Android 앱 (Java, Android Studio)
-└── backend/   # REST API 서버 (Node.js, Express, PostgreSQL)
+├── frontend/   # Android 앱 (Java, Android Studio)
+└── backend/    # REST API 서버 (Node.js, Express, PostgreSQL)
 ```
 
 ---
 
-## ✨ 주요 기능
+## 주요 기능
 
-### 🏠 홈 화면
+### 홈 화면
 - 오늘의 루틴 아이템 + 투두를 한 화면에서 통합 표시
 - 완료 체크 시 취소선으로 즉각적인 피드백 제공
 - 루틴 아이템 시간순 · 투두 가나다순 정렬
+- 월간 잔디 캘린더로 루틴 + 투두 수행 현황 시각화
 
-### 🔄 루틴 관리
+### 루틴 관리
 - 루틴 생성 / 수정 / 삭제
 - 요일별 반복 스케줄 설정 (월~일 자유 선택)
-- 루틴 내 시간별 아이템 추가 및 완료 체크
-- 🤖 **AI 루틴 자동 생성** (개발 진행 중)
+- 루틴 내 시간별 아이템(`HH:MM 행동`) 추가 및 완료 체크
 
-### ✅ 투두 리스트
-- 날짜별 투두 추가 / 수정 / 삭제
+### AI 만들기 (Gemini 2.5 Flash)
+- **루틴 모드**: 자연어 입력 또는 사진 첨부 → AI가 `HH:MM 행동` 형식의 루틴 아이템 생성
+  - 요일 언급 시 스케줄 자동 인식 (예: "매주 금요일" → 금요일만 설정)
+  - 미리보기 확인 후 "루틴 등록하기" 버튼으로 DB 저장
+- **리스트 모드**: 자연어 입력 또는 사진 첨부 → AI가 간결한 할 일 목록 생성
+  - 날짜 선택 후 "리스트 등록하기" 버튼으로 해당 날짜 투두로 저장
+- 챗봇 형식 UI — 대화 기록 유지, 이미지 첨부 선택 사항
+
+### 투두 리스트
+- 날짜별 투두 추가 / 수정 / 삭제 (직접 입력)
 - 완료 체크 및 가나다순 정렬
-- 월간 달력 뷰에서 루틴 + 투두 수행 현황 통합 확인
 
-### 📖 일기
+### 일기
 - 날짜 선택 후 일기 작성 / 수정 / 삭제
-- **완료된 루틴·투두 자동 태그**: 해당 날짜의 완료 항목이 자동으로 로드
-  - 루틴 완료 항목 → 첫 번째 줄 (초록색 텍스트)
-  - 투두 완료 항목 → 두 번째 줄 (초록색 텍스트)
+- 해당 날짜의 완료된 루틴·투두 항목 자동 태그 (초록색 텍스트)
 - 제목 / 내용 / 날짜 기반 검색
 
-### 👤 마이페이지
-- Google 계정 프로필 이미지 자동 연동 (CircleCrop)
-- Google 계정 이메일 표시
+### 마이페이지
+- Google 계정 프로필 이미지 · 이메일 자동 연동
 - 회원 탈퇴
 
 ---
 
-## 🛠️ 기술 스택
+## 기술 스택
 
 ### Frontend (Android)
 | 항목 | 내용 |
@@ -87,13 +91,14 @@ databaseteam/
 | Runtime | Node.js |
 | Framework | Express 5 |
 | Database | PostgreSQL |
-| ORM | node-postgres (pg) |
+| DB 드라이버 | node-postgres (pg) |
 | 인증 | JWT (jsonwebtoken) |
 | Google 인증 | google-auth-library |
+| AI | Google Gemini 2.5 Flash (@google/generative-ai) |
 
 ---
 
-## 🗄️ 데이터베이스 스키마
+## 데이터베이스 스키마
 
 ```sql
 -- 사용자
@@ -121,7 +126,7 @@ CREATE TABLE routine_schedules (
     day_of_week INTEGER NOT NULL
 );
 
--- 루틴 아이템
+-- 루틴 아이템 ("HH:MM 행동설명" 형식)
 CREATE TABLE routine_items (
     id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     routine_id UUID NOT NULL REFERENCES ROUTINES(id),
@@ -147,18 +152,18 @@ CREATE TABLE TODOS (
     target_date  DATE
 );
 
--- 일기 (title·content·routineTags·listTags를 JSON으로 content 컬럼에 저장)
+-- 일기
 CREATE TABLE DIARIES (
     id          SERIAL PRIMARY KEY,
     user_id     UUID NOT NULL,
-    content     TEXT,       -- JSON packed: {title, content, routineTags, listTags}
+    content     TEXT,   -- JSON: {title, content, routineTags, listTags}
     target_date DATE
 );
 ```
 
 ---
 
-## 🔌 API 엔드포인트
+## API 엔드포인트
 
 모든 API는 `Authorization: Bearer <JWT>` 헤더 필요 (`/api/auth` 제외)
 
@@ -180,16 +185,18 @@ CREATE TABLE DIARIES (
 | DELETE | `/api/routine/:id/items/:itemId` | 아이템 삭제 |
 | POST | `/api/routine/:id/items/:itemId/complete` | 완료 체크 / 해제 |
 | GET | `/api/routine/:id/items/completions` | 날짜별 완료 현황 |
+| POST | `/api/routine/from-image` | AI 루틴 미리보기 생성 (DB 저장 없음) |
 
 ### 투두
 | Method | Endpoint | 설명 |
 |--------|----------|------|
 | GET | `/api/todo?target_date=YYYY-MM-DD` | 날짜별 투두 조회 |
 | GET | `/api/todo/all` | 전체 투두 조회 |
-| GET | `/api/todo/monthly?year=&month=` | 월별 투두 조회 |
+| GET | `/api/todo/monthly?year=&month=` | 월별 완료 수 조회 |
 | POST | `/api/todo` | 투두 추가 |
 | PATCH | `/api/todo/:id` | 투두 수정 |
 | DELETE | `/api/todo/:id` | 투두 삭제 |
+| POST | `/api/todo/from-ai` | AI 리스트 미리보기 생성 (DB 저장 없음) |
 
 ### 일기
 | Method | Endpoint | 설명 |
@@ -210,7 +217,7 @@ CREATE TABLE DIARIES (
 
 ---
 
-## 🚀 실행 방법
+## 실행 방법
 
 ### Backend
 
@@ -219,12 +226,13 @@ cd backend
 npm install
 ```
 
-`.env` 파일 생성:
+`.env.example`을 복사해 `.env` 파일 생성:
+
 ```env
-DATABASE_URL=your_postgresql_connection_string
-JWT_SECRET=your_jwt_secret
+DATABASE_URL=postgresql://유저명:비밀번호@호스트:5432/DB이름
+JWT_SECRET=your_jwt_secret_key
 GOOGLE_CLIENT_ID=your_google_client_id
-PORT=3000
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ```bash
@@ -235,22 +243,23 @@ node server.js
 
 1. Android Studio에서 `frontend/` 폴더 열기
 2. `RetrofitClient.java`의 `BASE_URL`을 서버 주소로 변경
-   - 에뮬레이터 사용 시: `http://10.0.2.2:3000/`
-   - 실기기 사용 시: `http://서버IP:3000/`
-3. `google-services.json` 배치 (`frontend/app/` 폴더)
+   - 에뮬레이터: `http://10.0.2.2:3000/`
+   - 실기기: `http://서버IP:3000/`
+3. `google-services.json`을 `frontend/app/` 폴더에 배치
 4. 빌드 및 실행
 
 ---
 
-## 📋 기획 대비 구현 현황
+## 구현 현황
 
 | 기능 | 상태 |
 |------|------|
-| 구글 로그인 실제 연동 | ✅ 완료 |
-| 루틴 / 투두 / 일기 DB 연동 | ✅ 완료 |
+| Google 로그인 연동 | ✅ 완료 |
+| 루틴 / 투두 / 일기 CRUD | ✅ 완료 |
 | 요일별 루틴 스케줄 설정 | ✅ 완료 |
-| 월간 수행 캘린더 (루틴 + 투두 합산) | ✅ 완료 |
+| 월간 잔디 캘린더 (루틴 + 투두 합산) | ✅ 완료 |
 | 일기 작성 시 완료 항목 자동 태그 | ✅ 완료 |
-| 마이페이지 구글 계정 연동 | ✅ 완료 |
-| AI 루틴 자동 생성 | 🔧 개발 진행 중 |
-
+| 마이페이지 Google 계정 연동 | ✅ 완료 |
+| AI 루틴 자동 생성 (Gemini) | ✅ 완료 |
+| AI 리스트 자동 생성 (Gemini) | ✅ 완료 |
+| AI 요일 스케줄 자동 인식 | ✅ 완료 |
