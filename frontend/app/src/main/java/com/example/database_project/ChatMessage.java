@@ -16,9 +16,10 @@ public class ChatMessage {
     public Uri    imageUri;
 
     // RESULT
-    public String       routineTitle;
-    public List<String> routineItems;
-    public boolean      registered = false; // 등록 완료 여부
+    public String        routineTitle;
+    public List<String>  routineItems;
+    public List<Integer> schedules;
+    public boolean       registered = false; // 등록 완료 여부
 
     /** 사용자 메시지 */
     public ChatMessage(String text, Uri imageUri) {
@@ -33,9 +34,10 @@ public class ChatMessage {
     }
 
     /** AI 미리보기 결과 메시지 */
-    public ChatMessage(String routineTitle, List<String> routineItems) {
+    public ChatMessage(String routineTitle, List<String> routineItems, List<Integer> schedules) {
         this.type         = TYPE_RESULT;
         this.routineTitle = routineTitle;
         this.routineItems = routineItems;
+        this.schedules    = schedules;
     }
 }

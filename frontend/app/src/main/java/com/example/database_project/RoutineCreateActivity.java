@@ -186,7 +186,10 @@ public class RoutineCreateActivity extends AppCompatActivity
                                     if (item.content != null) itemContents.add(item.content);
                                 }
                             }
-                            messages.add(new ChatMessage(data.routineTitle, itemContents));
+                            List<Integer> schedules = (data.schedules != null && !data.schedules.isEmpty())
+                                    ? data.schedules
+                                    : Arrays.asList(0, 1, 2, 3, 4, 5, 6);
+                            messages.add(new ChatMessage(data.routineTitle, itemContents, schedules));
                             adapter.notifyItemInserted(messages.size() - 1);
                             scrollToBottom();
                         } else {
@@ -222,7 +225,7 @@ public class RoutineCreateActivity extends AppCompatActivity
         Map<String, Object> routineBody = new HashMap<>();
         routineBody.put("routine_name", msg.routineTitle);
         routineBody.put("description",  "");
-        routineBody.put("schedules",    Arrays.asList(0,1,2,3,4,5,6)); // 기본: 매일
+        routineBody.put("schedules",    msg.schedules != null ? msg.schedules : Arrays.asList(0,1,2,3,4,5,6));
 
         RetrofitClient.getRoutineApi(this)
                 .createRoutine(routineBody)

@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -71,6 +72,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (holder instanceof ResultVH) {
             ResultVH vh = (ResultVH) holder;
             vh.tvTitle.setText(msg.routineTitle);
+            vh.tvSchedule.setText(formatSchedule(msg.schedules));
             vh.layoutItems.removeAllViews();
 
             if (msg.routineItems != null) {
@@ -108,6 +110,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override public int getItemCount() { return messages.size(); }
 
+    private String formatSchedule(List<Integer> schedules) {
+        if (schedules == null || schedules.isEmpty()) return "매일";
+        List<Integer> sorted = new ArrayList<>(schedules);
+        java.util.Collections.sort(sorted);
+        // 매일
+        if (sorted.size() == 7) return "📅 매일";
+        // 평일 (1~5)
+        if (sorted.size() == 5 && sorted.get(0) == 1 && sorted.get(4) == 5) return "📅 평일 (월~금)";
+        // 주말 (0, 6)
+        if (sorted.size() == 2 && sorted.get(0) == 0 && sorted.get(1) == 6) return "📅 주말 (토·일)";
+        // 개별 요일
+        String[] names = {"일", "월", "화", "수", "목", "금", "토"};
+        StringBuilder sb = new StringBuilder("📅 매주 ");
+        for (int i = 0; i < sorted.size(); i++) {
+            if (i > 0) sb.append("·");
+            sb.append(names[sorted.get(i)]);
+        }
+        return sb.toString();
+    }
+
     private int dp(int v) {
         return Math.round(v * context.getResources().getDisplayMetrics().density);
     }
@@ -132,11 +154,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static class ResultVH extends RecyclerView.ViewHolder {
         TextView     tvTitle;
+        TextView     tvSchedule;
         LinearLayout layoutItems;
         Button       btnRegister;
         ResultVH(View v) {
             super(v);
             tvTitle     = v.findViewById(R.id.tv_routine_title);
+            tvSchedule  = v.findViewById(R.id.tv_schedule);
             layoutItems = v.findViewById(R.id.layout_items);
             btnRegister = v.findViewById(R.id.btn_register);
         }

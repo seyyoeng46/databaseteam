@@ -445,6 +445,7 @@ router.post('/from-image', async (req, res) => {
             success: true,
             data: {
                 routine_title: generatedData.routine_title,
+                schedules: generatedData.schedules || [0,1,2,3,4,5,6],
                 items: generatedData.items   // [{ content: "HH:MM 행동설명" }]
             }
         });

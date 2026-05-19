@@ -10,6 +10,7 @@ public class AiRoutineResponse {
 
     public static class PreviewData {
         @SerializedName("routine_title") public String         routineTitle;
+        @SerializedName("schedules")     public List<Integer>  schedules;
         @SerializedName("items")         public List<ItemData> items;
     }
 
