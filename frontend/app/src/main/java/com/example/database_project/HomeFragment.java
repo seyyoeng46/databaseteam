@@ -95,6 +95,12 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (llList != null) loadTodayData();
+    }
+
     private Calendar getSelectedCalendar() {
         Calendar c = Calendar.getInstance();
         c.set(selectedYear, selectedMonth, selectedDay);
