@@ -332,6 +332,39 @@ public class RoutineFragment extends Fragment {
 
         sheetView2.findViewById(R.id.option_list).setOnClickListener(v -> {
             dialog2.dismiss();
+            showTodoTypeBottomSheet();
+        });
+
+        dialog2.setContentView(sheetView2);
+        if (dialog2.getWindow() != null)
+            dialog2.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog2.show();
+    }
+
+    private void showTodoTypeBottomSheet() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View sheetView = LayoutInflater.from(getContext())
+                .inflate(R.layout.bottom_sheet_todo_type, (ViewGroup) getView(), false);
+
+        sheetView.findViewById(R.id.option_ai).setOnClickListener(v -> {
+            dialog.dismiss();
+            Calendar cal = Calendar.getInstance();
+            new DatePickerDialog(requireContext(),
+                    (view, year, month, dayOfMonth) -> {
+                        String selectedDate = String.format(Locale.getDefault(),
+                                "%04d.%02d.%02d", year, month + 1, dayOfMonth);
+                        Intent intent = new Intent(getActivity(), AiTodoActivity.class);
+                        intent.putExtra("selected_date", selectedDate);
+                        startActivityForResult(intent, 4001);
+                    },
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        });
+
+        sheetView.findViewById(R.id.option_manual).setOnClickListener(v -> {
+            dialog.dismiss();
             Calendar cal = Calendar.getInstance();
             new DatePickerDialog(requireContext(),
                     (view, year, month, dayOfMonth) -> {
@@ -348,10 +381,10 @@ public class RoutineFragment extends Fragment {
             ).show();
         });
 
-        dialog2.setContentView(sheetView2);
-        if (dialog2.getWindow() != null)
-            dialog2.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog2.show();
+        dialog.setContentView(sheetView);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 
     private void showAddBottomSheet() {

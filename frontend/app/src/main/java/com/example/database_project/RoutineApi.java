@@ -116,4 +116,8 @@ public interface RoutineApi {
     // AI 이미지로 루틴 생성
     @POST("api/routine/from-image")
     Call<AiRoutineResponse> createRoutineFromImage(@Body Map<String, String> body);
+
+    // AI로 할 일 목록 생성
+    @POST("api/todo/from-ai")
+    Call<AiTodoResponse> createTodosFromAi(@Body Map<String, String> body);
 }

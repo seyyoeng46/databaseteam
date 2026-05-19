@@ -39,6 +39,12 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- AI 리스트 생성 화면 -->
+        <activity
+            android:name=".AiTodoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- 투두 생성 화면 추가 -->
         <activity
             android:name=".TodoCreateActivity"
