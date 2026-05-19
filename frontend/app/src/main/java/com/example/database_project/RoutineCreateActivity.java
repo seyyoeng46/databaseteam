@@ -128,17 +128,17 @@ public class RoutineCreateActivity extends AppCompatActivity
     private void setMode(int mode) {
         currentMode = mode;
         if (mode == MODE_ROUTINE) {
-            chipRoutine.setBackgroundResource(R.drawable.bg_btn_register);
+            chipRoutine.setBackgroundResource(R.drawable.bg_chip_selected);
             chipRoutine.setTextColor(0xFFFFFFFF);
-            chipList.setBackgroundResource(R.drawable.bg_day_unselected);
+            chipList.setBackgroundResource(R.drawable.bg_chip_unselected);
             chipList.setTextColor(0xFF888780);
             layoutTodoDate.setVisibility(View.GONE);
             tvSubtitle.setText("원하는 루틴을 입력하거나 사진을 첨부하세요");
             etInput.setHint("원하는 루틴을 입력하세요");
         } else {
-            chipList.setBackgroundResource(R.drawable.bg_btn_register);
+            chipList.setBackgroundResource(R.drawable.bg_chip_selected);
             chipList.setTextColor(0xFFFFFFFF);
-            chipRoutine.setBackgroundResource(R.drawable.bg_day_unselected);
+            chipRoutine.setBackgroundResource(R.drawable.bg_chip_unselected);
             chipRoutine.setTextColor(0xFF888780);
             layoutTodoDate.setVisibility(View.VISIBLE);
             tvSubtitle.setText("원하는 할 일을 입력하거나 사진을 첨부하세요");
