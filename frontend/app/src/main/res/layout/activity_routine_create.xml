@@ -36,17 +36,96 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI 루틴 만들기"
+                android:text="AI 만들기"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#2C2C2A"/>
 
             <TextView
+                android:id="@+id/tv_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="원하는 루틴을 입력하거나 사진을 첨부하세요"
                 android:textSize="11sp"
                 android:textColor="#888780"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 모드 토글 (루틴 / 리스트) -->
+    <LinearLayout
+        android:id="@+id/layout_mode_toggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="10dp"
+        android:background="#F9F7F2"
+        android:layout_below="@id/header">
+
+        <TextView
+            android:id="@+id/chip_routine"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="루틴"
+            android:textSize="13sp"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:background="@drawable/bg_btn_register"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:id="@+id/chip_list"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="리스트"
+            android:textSize="13sp"
+            android:textColor="#888780"
+            android:gravity="center"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:background="@drawable/bg_day_unselected"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <!-- 날짜 선택 (리스트 모드에서만 표시) -->
+        <LinearLayout
+            android:id="@+id/layout_todo_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/tv_todo_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#378ADD"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" ▾"
+                android:textSize="11sp"
+                android:textColor="#378ADD"/>
 
         </LinearLayout>
 
@@ -186,7 +265,7 @@
         android:id="@+id/rv_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/header"
+        android:layout_below="@id/layout_mode_toggle"
         android:layout_above="@id/input_area"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

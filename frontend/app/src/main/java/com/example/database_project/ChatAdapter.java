@@ -45,6 +45,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return new UserVH(inf.inflate(R.layout.item_chat_user, parent, false));
             case ChatMessage.TYPE_LOADING:
                 return new LoadingVH(inf.inflate(R.layout.item_chat_loading, parent, false));
+            case ChatMessage.TYPE_TODO_RESULT:
+                return new TodoResultVH(inf.inflate(R.layout.item_chat_ai_todo_result, parent, false));
             default:
                 return new ResultVH(inf.inflate(R.layout.item_chat_ai_result, parent, false));
         }
@@ -105,6 +107,40 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         registerListener.onRegister(msg, holder.getAdapterPosition());
                 });
             }
+
+        } else if (holder instanceof TodoResultVH) {
+            TodoResultVH vh = (TodoResultVH) holder;
+            vh.layoutItems.removeAllViews();
+
+            if (msg.routineItems != null) {
+                for (String item : msg.routineItems) {
+                    android.widget.TextView tv = new android.widget.TextView(context);
+                    tv.setText("• " + item);
+                    tv.setTextSize(13f);
+                    tv.setTextColor(0xFF2C2C2A);
+                    tv.setLineSpacing(0, 1.3f);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    lp.bottomMargin = dp(6);
+                    tv.setLayoutParams(lp);
+                    vh.layoutItems.addView(tv);
+                }
+            }
+
+            if (msg.registered) {
+                vh.btnRegister.setText("등록 완료 ✓");
+                vh.btnRegister.setEnabled(false);
+                vh.btnRegister.setAlpha(0.5f);
+            } else {
+                vh.btnRegister.setText("리스트 등록하기");
+                vh.btnRegister.setEnabled(true);
+                vh.btnRegister.setAlpha(1.0f);
+                vh.btnRegister.setOnClickListener(v -> {
+                    if (registerListener != null)
+                        registerListener.onRegister(msg, holder.getAdapterPosition());
+                });
+            }
         }
     }
 
@@ -150,6 +186,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static class LoadingVH extends RecyclerView.ViewHolder {
         LoadingVH(View v) { super(v); }
+    }
+
+    static class TodoResultVH extends RecyclerView.ViewHolder {
+        LinearLayout layoutItems;
+        Button       btnRegister;
+        TodoResultVH(View v) {
+            super(v);
+            layoutItems = v.findViewById(R.id.layout_todo_items);
+            btnRegister = v.findViewById(R.id.btn_register);
+        }
     }
 
     static class ResultVH extends RecyclerView.ViewHolder {
