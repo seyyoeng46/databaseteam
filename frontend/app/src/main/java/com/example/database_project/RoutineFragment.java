@@ -87,6 +87,7 @@ public class RoutineFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CREATE_ROUTINE || requestCode == 3001) {
             loadRoutines();
+            loadTodos();
         } else if (requestCode == 4001 && resultCode == android.app.Activity.RESULT_OK) {
             loadTodos();
         } else if (requestCode == 5001 && resultCode == android.app.Activity.RESULT_OK) {
