@@ -35,6 +35,8 @@ databaseteam/
 └── backend/    # REST API 서버 (Node.js, Express, PostgreSQL)
 ```
 
+> 백엔드 원본 코드: https://github.com/dltpgh6021/planner-backend.git
+
 ---
 
 ## 주요 기능
