@@ -13,17 +13,7 @@ erDiagram
         string email "사용자 이메일"
         string username "사용자 이름"
     }
-    
-    TODOS {
-        uuid id PK
-        uuid user_id FK "USERS 참조"
-        string title
-        text content
-        boolean is_completed
-        date target_date
-        timestamp created_at
-    }
-    
+
     ROUTINES {
         uuid id PK
         uuid user_id FK "USERS 참조"
@@ -31,31 +21,37 @@ erDiagram
         text description
         timestamp created_at
     }
-    
+
+    ROUTINE_SCHEDULES {
+        uuid routine_id PK_FK "ROUTINES 참조"
+        int day_of_week PK "0(일)~6(토)"
+    }
+
     ROUTINE_ITEMS {
         uuid id PK
         uuid routine_id FK "ROUTINES 참조"
-        string title
-        int list_order
-    }
-    
-    ROUTINE_SCHEDULES {
-        uuid routine_id PK,FK "ROUTINES 참조"
-        int day_of_week PK "0(일)~6(토) 등 요일 값"
-    }
-    
-    DIARIES {
-        uuid id PK
-        uuid user_id FK "USERS 참조"
-        text content
-        date target_date
-        timestamp created_at
+        string title "HH:MM 행동설명 형식"
     }
 
     ROUTINE_COMPLETIONS {
-    uuid id PK
-    uuid user_id FK "USERS 참조"
-    uuid routine_item_id FK "ROUTINE_ITEMS 참조"
-    date completed_date "완료한 날짜"
-    timestamp created_at
+        uuid id PK
+        uuid user_id FK "USERS 참조"
+        uuid routine_item_id FK "ROUTINE_ITEMS 참조, UNIQUE with completed_date"
+        date completed_date "완료한 날짜, UNIQUE with routine_item_id"
+    }
+
+    TODOS {
+        serial id PK
+        uuid user_id FK "USERS 참조"
+        string title
+        text content
+        boolean is_completed
+        date target_date
+    }
+
+    DIARIES {
+        serial id PK
+        uuid user_id FK "USERS 참조"
+        text content "JSON: {title, content, routineTags, listTags}"
+        date target_date
     }
